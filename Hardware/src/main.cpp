@@ -3,15 +3,22 @@
 #include "Adafruit_seesaw.h"
 #include "DHT.h"
 #include "Adafruit_CCS811.h"
+#include "DFRobot_C4001.h"
 
 #define DHTPIN 4     // Define the pin you connected the DHT11 data pin to
 #define DHTTYPE DHT11   // DHT11 sensor type
 #define MQ8_PIN 34  // Analog pin for MQ-8 sensor
 #define CCS811_WAKE 5  // Optional: Connect WAKE pin to GPIO5 or connect directly to GND
+#define C4001_I2C_ADDR 0x2A  // Default I2C address for C4001
+
+// Add UART pins definition
+#define RX_PIN 16  // GPIO16
+#define TX_PIN 17  // GPIO17
 
 Adafruit_seesaw ss;
 DHT dht(DHTPIN, DHTTYPE);
 Adafruit_CCS811 ccs;
+DFRobot_C4001_UART radar(&Serial2, 9600, RX_PIN, TX_PIN);  // Use UART instead of I2C version
 
 void setup() {
   Serial.begin(115200);
@@ -21,6 +28,9 @@ void setup() {
   
   // Initialize I2C
   Wire.begin(22, 21);
+  
+  // Initialize UART for radar
+  Serial2.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);
   
   // Initialize DHT11
   dht.begin();
@@ -50,6 +60,34 @@ void setup() {
     Serial.print("seesaw started! version: ");
     Serial.println(ss.getVersion(), HEX);
   }
+  
+  // Initialize C4001 mmWave sensor with better debug
+  int retries = 0;
+  while (!radar.begin() && retries < 5) {
+    Serial.println("C4001 Initialization failed!");
+    Serial.println("Check UART wiring (TX->RX, RX->TX) and power...");
+    Serial.printf("Retry %d/5\n", retries + 1);
+    delay(1000);
+    retries++;
+  }
+
+  if (retries >= 5) {
+    Serial.println("Failed to initialize radar after 5 attempts");
+    Serial.println("1. Check power supply is 3.3V");
+    Serial.println("2. Verify TX->RX, RX->TX connections");
+    Serial.println("3. Ensure GND is connected");
+  } else {
+    Serial.println("C4001 Initialized successfully!");
+  }
+  
+  // Configure sensor mode (Speed detection mode)
+  radar.setSensorMode(eSpeedMode);
+  
+  // Set detection thresholds (min distance, max distance, threshold)
+  radar.setDetectThres(30, 2500, 10);  // 0.3m to 25m range
+  
+  // Enable fretting detection
+  radar.setFrettingDetection(eON);
 }
 
 void loop() {
@@ -97,6 +135,32 @@ void loop() {
     } else {
       Serial.println("ERROR reading CCS811 data");
     }
+  }
+  
+  Serial.println("\n----- C4001 mmWave Sensor Readings -----");
+  
+  // Get number of detected targets
+  uint8_t targetCount = radar.getTargetNumber();
+  Serial.print("Target Count: "); 
+  Serial.println(targetCount);
+  
+  if (targetCount > 0) {
+    // Get target speed (-7 to +7 m/s, negative = moving away)
+    float speed = radar.getTargetSpeed();
+    Serial.print("Target Speed: ");
+    Serial.print(speed);
+    Serial.println(" m/s");
+    
+    // Get target distance (in meters)
+    float distance = radar.getTargetRange();
+    Serial.print("Target Distance: ");
+    Serial.print(distance);
+    Serial.println(" m");
+    
+    // Get target energy level (signal strength)
+    uint16_t energy = radar.getTargetEnergy();
+    Serial.print("Target Energy: ");
+    Serial.println(energy);
   }
   
   delay(2000);  // Wait 2 seconds between measurements
