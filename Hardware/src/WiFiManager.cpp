@@ -1,4 +1,6 @@
 #include "WiFiManager.h"
+#include "esp_wpa2.h"
+#include <Arduino.h>
 
 WiFiManager::WiFiManager() 
     : currentNetwork(0)
@@ -17,9 +19,17 @@ void WiFiManager::addNetwork(int index, const char* ssid, const char* password) 
 }
 
 bool WiFiManager::connectToNetwork(const char* ssid, const char* password) {
-    Serial.printf("Attempting to connect to %s\n", ssid);
-    
-    WiFi.begin(ssid, password);
+    if (isEnterpriseMode) {
+        WiFi.disconnect(true);
+        WiFi.mode(WIFI_STA);
+        esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)enterpriseIdentity, strlen(enterpriseIdentity));
+        esp_wifi_sta_wpa2_ent_set_username((uint8_t *)enterpriseIdentity, strlen(enterpriseIdentity));
+        esp_wifi_sta_wpa2_ent_set_password((uint8_t *)enterprisePassword, strlen(enterprisePassword));
+        esp_wifi_sta_wpa2_ent_enable();
+        WiFi.begin(ssid);
+    } else {
+        WiFi.begin(ssid, password);
+    }
     
     // Wait for connection with timeout
     unsigned long startAttempt = millis();
@@ -98,4 +108,10 @@ void WiFiManager::disconnect() {
     WiFi.disconnect();
     isConnected = false;
     Serial.println("WiFi disconnected");
+}
+
+void WiFiManager::configureEnterprise(const char* identity, const char* password) {
+    isEnterpriseMode = true;
+    enterpriseIdentity = identity;
+    enterprisePassword = password;
 }
