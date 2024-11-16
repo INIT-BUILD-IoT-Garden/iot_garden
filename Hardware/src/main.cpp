@@ -8,6 +8,8 @@
 #include <PubSubClient.h>
 #include <time.h>
 #include "WiFiManager.h"
+#include "esp_wpa2.h"  // Add this for WPA2 Enterprise support
+#include "secrets.h"
 
 #define LED_PIN 2  // Built-in LED on ESP32 board
 
@@ -22,7 +24,7 @@
 #define TX_PIN 17  // GPIO17
 
 // Add MQTT configuration
-const char* mqtt_server = "172.20.10.8";  // Your MQTT broker IP
+const char* mqtt_server = secrets.mqtt_server;  // MQTT broker IP
 const int mqtt_port = 1883;
 const char* mqtt_topic = "/home/sensors";
 
@@ -32,6 +34,11 @@ PubSubClient client(espClient);
 
 // Create WiFiManager instance
 WiFiManager wifiManager;
+
+// Add WPA2 Enterprise credentials
+const char* ssid = secrets.ssid;  // Your eduroam SSID
+const char* identity = secrets.identity;  // Your eduroam username
+const char* password = secrets.password;  // Your eduroam password
 
 // Add MQTT connection function
 bool connectToMQTT() {
@@ -84,7 +91,7 @@ void handleLedFeedback() {
     }
 }
 
-// Replace sendSensorData function
+
 void sendSensorData(float soilTemp, uint16_t soilMoisture, float airTemp, float humidity, 
                    int h2Value, float h2Voltage, uint16_t co2, uint16_t tvoc,
                    uint8_t targetCount, float speed, float distance, uint16_t energy) {
@@ -149,16 +156,45 @@ void setup() {
     Serial.begin(115200);
     while (!Serial) delay(10);
     
-    // Configure WiFi networks
-    wifiManager.addNetwork(0, "SSID1", "password1");
-    wifiManager.addNetwork(1, "SSID2", "password2");
+    // Configure WiFi for eduroam
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_STA);
     
-    // Connect to WiFi
-    Serial.println("Connecting to WiFi...");
-    while (!wifiManager.connect()) {
-        delay(1000);
-        Serial.println("Retrying WiFi connection...");
+    // Configure WPA2 Enterprise
+    esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)identity, strlen(identity));
+    esp_wifi_sta_wpa2_ent_set_username((uint8_t *)identity, strlen(identity));
+    esp_wifi_sta_wpa2_ent_set_password((uint8_t *)password, strlen(password));
+    esp_wifi_sta_wpa2_ent_enable();
+
+    // Connect to eduroam
+    WiFi.begin(ssid, password);
+    
+    // Wait for connection
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+        delay(500);
+        Serial.print(".");
+        attempts++;
     }
+    
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("\nWiFi connected");
+        Serial.println("IP address: ");
+        Serial.println(WiFi.localIP());
+    } else {
+        Serial.println("\nWiFi connection failed");
+    }
+
+    // Initialize WiFi in enterprise mode
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_STA);
+    esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)identity, strlen(identity));
+    esp_wifi_sta_wpa2_ent_set_username((uint8_t *)identity, strlen(identity));
+    esp_wifi_sta_wpa2_ent_set_password((uint8_t *)password, strlen(password));
+    esp_wifi_sta_wpa2_ent_enable();
+
+    // Connect to eduroam
+    WiFi.begin(ssid, password);
     
     // Initialize I2C
     Wire.begin(22, 21);
