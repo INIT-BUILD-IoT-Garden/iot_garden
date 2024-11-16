@@ -2,6 +2,7 @@
 #define WIFI_MANAGER_H
 
 #include <WiFi.h>
+#include "esp_wpa2.h"
 
 class WiFiManager {
 private:
@@ -27,6 +28,11 @@ private:
     bool connectToNetwork(const char* ssid, const char* password);
     void resetConnectionStatus();
 
+    // Add to the private section of the WiFiManager class
+    bool isEnterpriseMode;
+    const char* enterpriseIdentity;
+    const char* enterprisePassword;
+
 public:
     WiFiManager();
     
@@ -43,6 +49,9 @@ public:
     String getCurrentSSID() const { return WiFi.SSID(); }
     int getRSSI() const { return WiFi.RSSI(); }
     IPAddress getLocalIP() const { return WiFi.localIP(); }
+
+    // Add to the public section
+    void configureEnterprise(const char* identity, const char* password);
 };
 
 #endif // WIFI_MANAGER_H
