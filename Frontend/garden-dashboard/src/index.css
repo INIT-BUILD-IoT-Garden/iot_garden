@@ -27,8 +27,8 @@ a:hover {
 
 body {
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
+  background: transparent;
 }
 
 #root {
@@ -76,10 +76,19 @@ button:focus-visible {
 .masonry-grid {
   display: flex;
   width: auto;
-  margin-left: -16px; /* Adjust based on your gap needs */
+  margin-left: -20px; /* Adjust based on your gap needs */
 }
 
 .masonry-grid_column {
-  padding-left: 16px; /* Adjust based on your gap needs */
+  padding-left: 20px; /* Adjust based on your gap needs */
   background-clip: padding-box;
+}
+
+.butterfly-container {
+  will-change: transform;
+}
+
+.wing-left, .wing-right {
+  transform-origin: center;
+  transform-box: fill-box;
 }
