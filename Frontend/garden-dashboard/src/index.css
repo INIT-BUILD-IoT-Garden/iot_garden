@@ -29,6 +29,7 @@ body {
   margin: 0;
   padding: 0;
   background: transparent;
+  overflow-x: hidden;
 }
 
 #root {
@@ -91,4 +92,17 @@ button:focus-visible {
 .wing-left, .wing-right {
   transform-origin: center;
   transform-box: fill-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.snap-y {
+  scroll-snap-type: y mandatory;
+}
+
+.snap-start {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }

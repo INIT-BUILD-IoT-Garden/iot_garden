@@ -7,7 +7,57 @@ import { WeatherSummary } from './WeatherSummary'
 import { AlertCard } from './AlertCard'
 import Masonry from 'react-masonry-css';
 
-export function Dashboard() {
+interface DashboardProps {
+  activeSection: 'hero' | 'dashboard';
+  setActiveSection: (section: 'hero' | 'dashboard') => void;
+}
+
+export function Dashboard({ activeSection, setActiveSection }: DashboardProps) {
+  const dashboardRef = useRef<HTMLDivElement>(null);
+  const lastScrollPosition = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!dashboardRef.current) return;
+      
+      const currentScroll = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const scrollingDown = currentScroll > lastScrollPosition.current;
+      const scrollingUp = currentScroll < lastScrollPosition.current;
+      
+      // Get total scrollable height and footer height
+      const totalHeight = document.documentElement.scrollHeight;
+      const footerHeight = 130; // Match your footer height
+      const footerThreshold = totalHeight - viewportHeight - footerHeight;
+      
+      // Don't trigger snapping if we're in the footer area
+      if (currentScroll > footerThreshold) {
+        lastScrollPosition.current = currentScroll;
+        return;
+      }
+      
+      // Thresholds for both directions
+      const downThreshold = viewportHeight * 0.01;
+      const upThreshold = viewportHeight * 0.99;
+      
+      // Snap to dashboard when scrolling down (but not into footer)
+      if (scrollingDown && currentScroll > downThreshold && currentScroll < footerThreshold) {
+        dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
+        setActiveSection('dashboard');
+      }
+      // Allow hero section to handle upward snap
+      else if (scrollingUp && currentScroll < upThreshold) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setActiveSection('hero');
+      }
+      
+      lastScrollPosition.current = currentScroll;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [setActiveSection]);
+
   const [sensorHistory, setSensorHistory] = useState<SensorData[]>([])
   
   useEffect(() => {
@@ -45,7 +95,10 @@ export function Dashboard() {
   ]
 
   return (
-    <div className="min-h-screen w-full pb-[200px]">
+    <div 
+      ref={dashboardRef} 
+      className="min-h-screen w-full pb-[130px]"
+    >
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-8 text-center">Green Campus Garden</h1>
         
@@ -84,7 +137,7 @@ export function Dashboard() {
         </div>
 
         {/* Sensor Cards */}
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto mb-8">
           <Masonry
             breakpointCols={{
               default: 3,
