@@ -23,7 +23,7 @@ export function GardenBackground({ grassOffset = 0 }: { grassOffset: number }) {
     }
 
     // Initialize grass blades
-    const BLADE_COUNT = 500;
+    const BLADE_COUNT = 400;
     const GRASS_COLORS = [
       { light: '#4a9143', dark: '#2d5a27' }, // Default green
       { light: '#3f7d3a', dark: '#2d5a27' }, // Darker green
