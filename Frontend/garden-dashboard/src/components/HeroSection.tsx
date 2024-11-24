@@ -69,11 +69,11 @@ export function HeroSection() {
       </div>
 
       {/* Init Logo Constellation */}
-      <div className="absolute left-8 top-8 z-10">
+      <div className="absolute left-8 bottom-8 z-10">
         <Constellation
           pathData={logoInitPaths}
           viewBox={logoInitViewBox}
-          className="h-[100px] w-[300px]"
+          className="w-[70%]"
           starCount={150}
           starSize={[1, 9]}
           delayRange={[0, 2]}
@@ -86,8 +86,8 @@ export function HeroSection() {
         <Constellation
           pathData={logoGCIPaths}
           viewBox={logoGCIViewBox}
-          className="h-[150px] w-[150px]" // Square dimensions since GCI logo is square
-          starCount={150} // Fewer stars for smaller logo
+          className="w-[40%]" 
+          starCount={150}
           starSize={[1, 5]}
           delayRange={[0, 2]}
           durationRange={[2, 4]}
@@ -99,7 +99,7 @@ export function HeroSection() {
         <Constellation
           pathData={svgPath}
           viewBox={viewBox}
-          className="absolute left-1/2 top-1/2 h-[900px] w-[900px] -translate-x-1/2 -translate-y-1/2"
+          className="absolute left-1/2 top-1/2 h-[50%] -translate-x-1/2 -translate-y-1/2"
         />
       </div>
 
@@ -113,35 +113,42 @@ export function HeroSection() {
         }}
       />
 
-      <div className="container relative z-30 mx-auto px-4 text-center">
-        <h1 className="mb-6 text-6xl font-bold text-white md:text-7xl">
-          Green Campus
-        </h1>
-        <p className="mx-auto mb-8 max-w-2xl text-xl text-white/80 md:text-2xl">
-          Monitoring and maintaining our garden ecosystem through advanced
-          sensor technology and real-time data analysis.
-        </p>
-        <button
-          onClick={() => {
-            const dashboardSection = document.querySelector(
-              "section:nth-child(2)",
-            );
-            dashboardSection?.scrollIntoView({ behavior: "smooth" });
-          }}
-          className="group cursor-pointer rounded-xl bg-white/10 px-4 py-2 text-white/50 transition-colors hover:text-white/80"
-        >
-          <p className="text-sm">Scroll to explore</p>
-          <svg
-            className="round mx-auto mt-2 h-6 w-6 animate-bounce fill-none stroke-current stroke-[3] transition-transform group-hover:translate-y-1"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
-        </button>
+      {/* Content with grid */}
+      <div className="relative z-30 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-5">
+          <div className="hidden md:block" />
+          <div className="col-span-1 md:col-span-3 px-4 text-center">
+            <h1 className="mb-6 text-6xl font-bold text-white md:text-7xl">
+              Green Campus
+            </h1>
+            <p className="mx-auto mb-8 max-w-2xl text-xl text-white/80 md:text-2xl">
+              Monitoring and maintaining our garden ecosystem through advanced
+              sensor technology and real-time data analysis.
+            </p>
+            <button
+              onClick={() => {
+                const dashboardSection = document.querySelector(
+                  "section:nth-child(2)",
+                );
+                dashboardSection?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="group cursor-pointer rounded-xl bg-white/10 px-4 py-2 text-white/50 transition-colors hover:text-white/80"
+            >
+              <p className="text-sm">Scroll to explore</p>
+              <svg
+                className="round mx-auto mt-2 h-6 w-6 animate-bounce fill-none stroke-current stroke-[3] transition-transform group-hover:translate-y-1"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                />
+              </svg>
+            </button>
+          </div>
+          <div className="hidden md:block" />
+        </div>
       </div>
     </section>
   );
