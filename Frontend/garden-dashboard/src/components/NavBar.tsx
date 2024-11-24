@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Separator } from "./ui/Separator";
-import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
+import { useState, useEffect } from "react";
+import { Separator } from "@/components/ui/Separator";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
 const menuItems = [
   { title: "Home", href: "#hero" },
@@ -11,7 +11,36 @@ const menuItems = [
 
 export function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
-  const isDashboardVisible = useIntersectionObserver("dashboard");
+  const [activeSection, setActiveSection] = useState("hero");
+  
+  // Update active section when hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) || "hero";
+      setActiveSection(hash);
+    };
+
+    // Initial check
+    handleHashChange();
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  // Use the callback to update active section and URL hash
+  const isDashboardVisible = useIntersectionObserver("dashboard", (isVisible) => {
+    if (isVisible) {
+      setActiveSection("dashboard");
+      window.history.replaceState(null, "", "#dashboard");
+    } else {
+      const heroSection = document.getElementById("hero");
+      const heroRect = heroSection?.getBoundingClientRect();
+      if (heroRect && heroRect.top >= -window.innerHeight / 2) {
+        setActiveSection("hero");
+        window.history.replaceState(null, "", "#hero");
+      }
+    }
+  });
 
   return (
     <>
@@ -67,23 +96,26 @@ export function NavBar() {
         }`}
       >
         <div className="relative flex flex-col items-start gap-5">
-          {menuItems.map((item) => (
-            <div key={item.title} className="group relative">
-              <a
-                href={item.href}
-                className={`text-lg font-semibold transition-colors hover:opacity-90 ${
-                  isDashboardVisible ? "text-black" : "text-white"
-                }`}
-              >
-                {item.title.toLowerCase()}
-              </a>
-              <span
-                className={`absolute -bottom-1 left-0 h-[2px] w-0 transition-all duration-300 group-hover:w-full ${
-                  isDashboardVisible ? "bg-black" : "bg-white"
-                }`}
-              />
-            </div>
-          ))}
+          {menuItems.map((item) => {
+            const isActive = activeSection === item.href.replace("#", "");
+            return (
+              <div key={item.title} className="group relative">
+                <a
+                  href={item.href}
+                  className={`text-lg font-semibold transition-colors hover:opacity-90 ${
+                    isDashboardVisible ? "text-black" : "text-white"
+                  }`}
+                >
+                  {item.title.toLowerCase()}
+                </a>
+                <span
+                  className={`absolute -bottom-1 left-0 h-[2px] transition-all duration-300 ${
+                    isDashboardVisible ? "bg-black" : "bg-white"
+                  } ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                />
+              </div>
+            );
+          })}
           <Separator
             orientation="vertical"
             className={`absolute -right-8 top-0 h-full w-[2px] ${

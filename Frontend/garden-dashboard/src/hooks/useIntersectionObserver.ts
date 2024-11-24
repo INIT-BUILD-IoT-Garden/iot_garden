@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function useIntersectionObserver(targetId: string) {
+export function useIntersectionObserver(targetId: string, callback?: (isVisible: boolean) => void) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -9,17 +9,19 @@ export function useIntersectionObserver(targetId: string) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        const newIsVisible = entry.isIntersecting;
+        setIsVisible(newIsVisible);
+        if (callback) callback(newIsVisible);
       },
       {
-        threshold: 0.1,
-        rootMargin: "-20% 0px -20% 0px",
-      },
+        threshold: [0, 0.5, 1],
+        rootMargin: "-45% 0px -45% 0px",
+      }
     );
 
     observer.observe(target);
     return () => observer.disconnect();
-  }, [targetId]);
+  }, [targetId, callback]);
 
   return isVisible;
 }
