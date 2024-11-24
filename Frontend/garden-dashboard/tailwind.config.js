@@ -57,13 +57,24 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        twinkle: {
-          '0%, 100%': { opacity: 0.1 },
-          '50%': { opacity: 1 },
-        }
+        'twinkle': {
+          '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+          '50%': { opacity: 0.2, transform: 'scale(0.8)' },
+        },
+        'clouds-back': {
+          'from': { backgroundPosition: '0 0' },
+          'to': { backgroundPosition: '10000px 0' }
+        },
+        'twinkle-constellation': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.3' },
+        },
       },
       animation: {
-        twinkle: 'twinkle var(--twinkle-duration, 3s) ease-in-out infinite'
+        'twinkle': 'twinkle var(--duration) ease-in-out infinite',
+        'clouds-back': 'clouds-back 200s linear infinite',
+        'constellation': 'constellation 30s ease-in-out infinite',
+        'twinkle-constellation': 'twinkle-constellation var(--duration) ease-in-out infinite',
       }
     },
   },
