@@ -39,7 +39,7 @@ export function AlertCard({ alerts }: AlertCardProps) {
                 <div className="space-y-1">
                   <p className="text-sm font-medium">{alert.message}</p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(alert.timestamp).toLocaleString()}
+                    {new Date(alert.timestamp).toLocaleString(undefined, { hour: 'numeric', minute: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric' })}
                   </p>
                 </div>
               </div>
