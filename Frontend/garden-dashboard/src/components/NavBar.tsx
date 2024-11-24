@@ -135,7 +135,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
       {/* Desktop Menu */}
       <nav
         className={`fixed left-[8%] z-50 hidden transition-all duration-500 ease-in-out md:block ${
-          isDashboardVisible ? "top-32" : "top-1/3"
+          isDashboardVisible || isAboutPage ? "top-32" : "top-1/3"
         }`}
       >
         <div className="relative flex flex-col items-start gap-5">
@@ -152,14 +152,14 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
                     handleNavigation(item.href);
                   }}
                   className={`text-lg font-semibold transition-colors hover:opacity-90 ${
-                    isDashboardVisible ? "text-black" : "text-white"
+                    isDashboardVisible || isAboutPage ? "text-black" : "text-white"
                   }`}
                 >
                   {item.title.toLowerCase()}
                 </a>
                 <span
                   className={`absolute -bottom-1 left-0 h-[2px] transition-all duration-300 ${
-                    isDashboardVisible ? "bg-black" : "bg-white"
+                    isDashboardVisible || isAboutPage ? "bg-black" : "bg-white"
                   } ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
                 />
               </div>
@@ -168,7 +168,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
           <Separator
             orientation="vertical"
             className={`absolute -right-8 top-0 h-full w-[2px] ${
-              isDashboardVisible ? "bg-black" : "bg-white"
+              isDashboardVisible || isAboutPage ? "bg-black" : "bg-white"
             }`}
           />
         </div>

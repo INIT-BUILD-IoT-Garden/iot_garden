@@ -21,8 +21,8 @@ export function AboutUs() {
         </div>
 
         {/* Background */}
-        <div className="absolute inset-0">
-          <GardenBackground />
+        <div className="sticky top-0 h-screen w-full">
+        <GardenBackground />
         </div>
 
         {/* Content */}
@@ -35,20 +35,20 @@ export function AboutUs() {
               <h1 className="mb-8 text-center text-4xl font-bold">About Us</h1>
               <div className="rounded-xl border border-black/30 bg-white/30 p-8 backdrop-blur-sm">
                 <p className="text-lg">
-                  Content coming soon...
+                Ipsum excepteur nisi magna consectetur cillum. Tempor non commodo veniam ad nostrud. Ex incididunt enim laborum elit nostrud aliqua mollit consectetur. Voluptate ipsum excepteur quis in ut sunt culpa minim. Est amet cupidatat cupidatat eu et. Elit in laboris sint aute amet. Duis non enim ipsum tempor incididunt aliquip sit sunt dolore officia. 
                 </p>
               </div>
             </div>
             {/* Right column - empty */}
-            <div className="hidden md:block" />
+            {/* <div className="hidden md:block" /> */}
           </div>
         </section>
 
+      </div>
         {/* Footer Section */}
         <section className="scroll-section">
           <Footer />
         </section>
-      </div>
     </main>
   );
 }
