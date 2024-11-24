@@ -1,136 +1,144 @@
-import { useEffect, useRef } from 'react';
+import * as React from "react";
+import clouds from "@/assets/cloud.png";
+import LogoInitSVG from "@/assets/logo_init.tsx";
+import LogoGCI from "@/assets/logo_gci.tsx";
+import PantherSVG from "@/assets/panther.tsx";
+import { Constellation } from "@/components/ui/Constellation";
 
-interface HeroSectionProps {
-  activeSection: 'hero' | 'dashboard';
-  setActiveSection: (section: 'hero' | 'dashboard') => void;
-}
+export function HeroSection() {
+  // Generate random star positions and properties
+  const stars = Array.from({ length: 100 }, () => ({
+    top: `${Math.random() * 100}%`,
+    left: `${Math.random() * 100}%`,
+    size: Math.random() * 2 + 3,
+    delay: Math.random() * 5,
+    duration: Math.random() * 2 + 5,
+  }));
 
-export function HeroSection({ activeSection, setActiveSection }: HeroSectionProps) {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const lastScrollPosition = useRef(0);
+  // Access the static properties directly
+  const rendered = PantherSVG({});
+  const svgPath = rendered?.props?.children?.props?.children?.props?.d;
+  const viewBox = rendered?.props?.viewBox;
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current || !contentRef.current) return;
-      
-      const currentScroll = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const scrollingUp = currentScroll < lastScrollPosition.current;
-      
-      // Snapping threshold
-      const snapThreshold = viewportHeight * 0.3;
-      
-      if (scrollingUp && currentScroll <= snapThreshold) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setActiveSection('hero');
-      }
-      
-      lastScrollPosition.current = currentScroll;
+  // Get both logo SVG path data
+  const logoInitRendered = LogoInitSVG({});
+  const logoInitPaths = React.Children.toArray(logoInitRendered.props.children)
+    .flatMap((group) => React.Children.toArray(group.props.children))
+    .filter((path) => path.props?.d)
+    .map((path) => path.props.d)
+    .join(" ");
+  const logoInitViewBox = logoInitRendered.props.viewBox;
 
-      // Adjust fade threshold
-      const fadeStart = viewportHeight * 0.2;
-      const fadeEnd = viewportHeight * 0.8;
-      
-      const progress = Math.max(0, Math.min(1, 
-        (currentScroll - fadeStart) / (fadeEnd - fadeStart)
-      ));
-      
-      // Update opacity and gradient in one place
-      if (contentRef.current) {
-        contentRef.current.style.opacity = (1 - progress).toString();
-      }
-      
-      const startColor = `rgba(0, 0, 0, ${1 - progress})`;
-      const midColor = `rgba(13, 25, 33, ${1 - progress})`;
-      const endColor = `rgba(25, 50, 66, ${1 - progress})`;
-      
-      sectionRef.current.style.background = 
-        `linear-gradient(to bottom, ${startColor}, ${midColor}, ${endColor})`;
-    };
+  // Get GCI logo path data
+  const logoGCIRendered = LogoGCI({});
+  const logoGCIPaths = React.Children.toArray(logoGCIRendered.props.children)
+    .flatMap((group) => React.Children.toArray(group.props.children))
+    .filter((path) => path.props?.d)
+    .map((path) => path.props.d)
+    .join(" ");
+  const logoGCIViewBox = logoGCIRendered.props.viewBox;
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [setActiveSection]);
-
-  // Helper function to generate random star properties
-  const generateStarProperties = () => {
-    const size = Math.random() * 3 + 1;
-    const opacity = Math.random() * 0.7 + 0.0;
-    const animationDuration = Math.random() * 5 + 2;
-    
-    return {
-      size,
-      opacity,
-      animationDuration,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-    };
-  };
-
-  const handleExploreClick = () => {
-    const viewportHeight = window.innerHeight;
-    window.scrollTo({ 
-      top: viewportHeight, 
-      behavior: 'smooth' 
-    });
-    setActiveSection('dashboard');
-  };
+  // console.log("Rendered SVG:", rendered);
+  // console.log("SVG Path:", svgPath);
+  // console.log("ViewBox:", viewBox);
+  // console.log("Logo Init Paths:", logoInitPaths);
+  // console.log("Logo Init ViewBox:", logoInitViewBox);
+  // console.log("Logo GCI Paths:", logoGCIPaths);
+  // console.log("Logo GCI ViewBox:", logoGCIViewBox);
 
   return (
-    <section 
-      ref={sectionRef}
-      className="h-screen w-full flex items-center justify-center relative"
-    >
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(100)].map((_, i) => {
-          const { size, opacity, animationDuration, left, top } = generateStarProperties();
-          
-          return (
-            <div
-              key={i}
-              className="absolute rounded-full animate-twinkle"
-              style={{
-                width: `${size}px`,
-                height: `${size}px`,
-                backgroundColor: 'white',
-                left,
-                top,
-                opacity,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${animationDuration}s`,
-              }}
-            />
-          );
-        })}
+    <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-black">
+      {/* Stars with random twinkling */}
+      <div className="absolute inset-0 z-0">
+        {stars.map((star, i) => (
+          <div
+            key={i}
+            className="absolute animate-twinkle rounded-full bg-white"
+            style={
+              {
+                top: star.top,
+                left: star.left,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                animationDelay: `${star.delay}s`,
+                "--duration": `${star.duration}s`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
       </div>
 
-      <div 
-        ref={contentRef}
-        className="container mx-auto px-4 text-center h-full flex flex-col items-center justify-center transition-opacity duration-200"
-      >
-        <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white">
+      {/* Init Logo Constellation */}
+      <div className="absolute left-8 top-8 z-10">
+        <Constellation
+          pathData={logoInitPaths}
+          viewBox={logoInitViewBox}
+          className="h-[100px] w-[300px]"
+          starCount={150}
+          starSize={[1, 9]}
+          delayRange={[0, 2]}
+          durationRange={[2, 4]}
+        />
+      </div>
+
+      {/* GCI Logo Constellation */}
+      <div className="absolute right-8 top-8 z-10">
+        <Constellation
+          pathData={logoGCIPaths}
+          viewBox={logoGCIViewBox}
+          className="h-[150px] w-[150px]" // Square dimensions since GCI logo is square
+          starCount={150} // Fewer stars for smaller logo
+          starSize={[1, 5]}
+          delayRange={[0, 2]}
+          durationRange={[2, 4]}
+        />
+      </div>
+
+      {/* Panther Constellation */}
+      <div className="absolute inset-0 z-10">
+        <Constellation
+          pathData={svgPath}
+          viewBox={viewBox}
+          className="absolute left-1/2 top-1/2 h-[900px] w-[900px] -translate-x-1/2 -translate-y-1/2"
+        />
+      </div>
+
+      {/* Clouds */}
+      <div
+        className="absolute inset-0 z-20 animate-clouds-back"
+        style={{
+          backgroundImage: `url(${clouds})`,
+          backgroundRepeat: "repeat",
+          backgroundPosition: "top center",
+        }}
+      />
+
+      <div className="container relative z-30 mx-auto px-4 text-center">
+        <h1 className="mb-6 text-6xl font-bold text-white md:text-7xl">
           Green Campus
         </h1>
-        <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-8">
-          Monitoring and maintaining our garden ecosystem through advanced sensor technology and real-time data analysis.
+        <p className="mx-auto mb-8 max-w-2xl text-xl text-white/80 md:text-2xl">
+          Monitoring and maintaining our garden ecosystem through advanced
+          sensor technology and real-time data analysis.
         </p>
-        <button 
-          onClick={handleExploreClick}
-          className="group animate-bounce bg-white/10 px-4 py-2 rounded-md text-white/50 hover:text-white/80 transition-colors cursor-pointer"
+        <button
+          onClick={() => {
+            const dashboardSection = document.querySelector(
+              "section:nth-child(2)",
+            );
+            dashboardSection?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="group cursor-pointer rounded-xl bg-white/10 px-4 py-2 text-white/50 transition-colors hover:text-white/80"
         >
           <p className="text-sm">Scroll to explore</p>
-          <svg 
-            className="w-6 h-6 mx-auto mt-2 group-hover:translate-y-1 transition-transform" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="round mx-auto mt-2 h-6 w-6 animate-bounce fill-none stroke-current stroke-[3] transition-transform group-hover:translate-y-1"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
             />
           </svg>
         </button>
