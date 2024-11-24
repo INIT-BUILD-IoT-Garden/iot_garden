@@ -17,13 +17,13 @@ function App() {
           <div className="hidden md:block" />
         </div>
         
-        <section className="h-screen snap-start">
+        <section id="hero" className="h-screen scroll-section">
           <HeroSection />
         </section>
-        <section className="snap-start">
+        <section id="dashboard" className="scroll-section">
           <Dashboard />
         </section>
-        <section className="snap-end">
+        <section id="footer" className="scroll-section">
           <Footer />
         </section>
       </div>

@@ -125,14 +125,9 @@ export function HeroSection() {
               Monitoring and maintaining our garden ecosystem through advanced
               sensor technology and real-time data analysis.
             </p>
-            <button
-              onClick={() => {
-                const dashboardSection = document.querySelector(
-                  "section:nth-child(2)",
-                );
-                dashboardSection?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="group cursor-pointer rounded-xl bg-white/10 px-4 py-2 text-white/50 transition-colors hover:text-white/80"
+            <a
+              href="#dashboard"
+              className="group inline-block cursor-pointer rounded-xl bg-white/10 px-4 py-2 text-white/50 transition-colors hover:text-white/80"
             >
               <p className="text-sm">Scroll to explore</p>
               <svg
@@ -145,7 +140,7 @@ export function HeroSection() {
                   d="M19 14l-7 7m0 0l-7-7m7 7V3"
                 />
               </svg>
-            </button>
+            </a>
           </div>
           <div className="hidden md:block" />
         </div>

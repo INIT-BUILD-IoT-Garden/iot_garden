@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Separator } from "./ui/Separator";
+import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 
 const menuItems = [
   { title: "Home", href: "#" },
@@ -9,6 +11,7 @@ const menuItems = [
 
 export function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
+  const isDashboardVisible = useIntersectionObserver("dashboard");
 
   return (
     <>
@@ -58,19 +61,35 @@ export function NavBar() {
       </div>
 
       {/* Desktop Menu */}
-      <nav className="fixed left-[8%] top-1/4 z-50 hidden transition-all duration-500 ease-in-out md:block [&:has(~div>section:nth-child(2).snap-align-start)]:top-1/2">
-        <div className="flex flex-col items-start gap-5">
+      <nav
+        className={`fixed left-[8%] z-50 hidden transition-all duration-500 ease-in-out md:block ${
+          isDashboardVisible ? "top-32" : "top-1/3"
+        }`}
+      >
+        <div className="relative flex flex-col items-start gap-5">
           {menuItems.map((item) => (
             <div key={item.title} className="group relative">
               <a
                 href={item.href}
-                className="text-lg font-semibold text-white transition-colors hover:text-white/90 [&:has(~section:nth-child(2).snap-align-start)]:text-black"
+                className={`text-lg font-semibold transition-colors hover:opacity-90 ${
+                  isDashboardVisible ? "text-black" : "text-white"
+                }`}
               >
                 {item.title.toLowerCase()}
               </a>
-              <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-white transition-all duration-300 group-hover:w-full [&:has(~section:nth-child(2).snap-align-start)]:bg-black" />
+              <span
+                className={`absolute -bottom-1 left-0 h-[2px] w-0 transition-all duration-300 group-hover:w-full ${
+                  isDashboardVisible ? "bg-black" : "bg-white"
+                }`}
+              />
             </div>
           ))}
+          <Separator
+            orientation="vertical"
+            className={`absolute -right-8 top-0 h-full w-[2px] ${
+              isDashboardVisible ? "bg-black" : "bg-white"
+            }`}
+          />
         </div>
       </nav>
     </>
