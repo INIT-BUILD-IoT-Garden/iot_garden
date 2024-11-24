@@ -1,12 +1,8 @@
 import { useEffect, useRef } from 'react';
-import * as THREE from 'three';
 
-export function GardenBackground({ grassOffset = 0 }: { grassOffset: number }) {
+export function GardenBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const threeCanvasRef = useRef<HTMLCanvasElement>(null);
   const animationIdRef = useRef<number>();
-  const rendererRef = useRef<THREE.WebGLRenderer>();
-  const sceneRef = useRef<THREE.Scene>();
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -25,17 +21,18 @@ export function GardenBackground({ grassOffset = 0 }: { grassOffset: number }) {
     // Initialize grass blades
     const BLADE_COUNT = 400;
     const GRASS_COLORS = [
-      { light: '#4a9143', dark: '#2d5a27' }, // Default green
-      { light: '#3f7d3a', dark: '#2d5a27' }, // Darker green
-      { light: '#55a84e', dark: '#2d5a27' }, // Brighter green
-      { light: '#4f9940', dark: '#2d5a27' }, // Olive green
-      { light: '#459638', dark: '#2d5a27' }, // Forest green
+      { light: '#22c55e', dark: '#2d5a27' }, 
+      { light: '#16a34a', dark: '#2d5a27' },
+      { light: '#15803d', dark: '#2d5a27' }, 
+      { light: '#10b981', dark: '#2d5a27' },
+      { light: '#059669', dark: '#2d5a27' },
     ];
 
     const blades = Array.from({ length: BLADE_COUNT }, () => {
       const colorSet = GRASS_COLORS[Math.floor(Math.random() * GRASS_COLORS.length)];
       return {
         x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
         height: 30 + Math.random() * 60,
         segments: 2 + Math.floor(Math.random() * 3),
         maxWidth: 2 + Math.random() * 12,
@@ -54,7 +51,7 @@ export function GardenBackground({ grassOffset = 0 }: { grassOffset: number }) {
         context.rotate(baseAngle);
         
         const segmentHeight = this.height / this.segments;
-        let currentWidth = this.maxWidth;
+        const currentWidth = this.maxWidth;
         
         // Create gradient for the blade
         const gradient = context.createLinearGradient(0, 0, 0, -this.height);
@@ -84,7 +81,7 @@ export function GardenBackground({ grassOffset = 0 }: { grassOffset: number }) {
             points.push([x, y]);
           } else if (i === this.segments) {
             // Create rounded tip
-            const tipOffset = nextWidth * 0.01;
+            const tipOffset = nextWidth * 0.02;
             context.quadraticCurveTo(
               x + bendX, y,
               (x + bendX) * 0.5, y - tipOffset
@@ -151,9 +148,9 @@ export function GardenBackground({ grassOffset = 0 }: { grassOffset: number }) {
       // Sort blades by y position for better layering
       blades.sort((a, b) => a.x - b.x);
 
-      // Draw grass
+      // Draw grass - always at the bottom of the viewport
       blades.forEach(blade => {
-        blade.draw(ctx, time / 1000, grassOffset);
+        blade.draw(ctx, time / 1000);
       });
     };
 
@@ -164,13 +161,21 @@ export function GardenBackground({ grassOffset = 0 }: { grassOffset: number }) {
 
     // Initial setup
     const resizeCanvas = () => {
-      const { clientWidth, clientHeight } = document.documentElement;
-      canvas.width = clientWidth;
-      canvas.height = clientHeight;
+      if (!canvasRef.current) return;
+      const canvas = canvasRef.current;
+      
+      // Get the dashboard container dimensions instead of viewport
+      const dashboardContainer = canvas.parentElement;
+      if (!dashboardContainer) return;
+      
+      canvas.width = dashboardContainer.clientWidth;
+      canvas.height = dashboardContainer.clientHeight;
       
       // Redistribute grass blades
       blades.forEach(blade => {
         blade.x = Math.random() * canvas.width;
+        // Keep grass at the bottom of the canvas
+        blade.y = canvas.height - (Math.random() * 100); // Vary grass height slightly
       });
     };
 
@@ -185,17 +190,12 @@ export function GardenBackground({ grassOffset = 0 }: { grassOffset: number }) {
       }
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, [grassOffset]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full"
-      style={{ 
-        zIndex: -20,
-        touchAction: 'none',
-        backgroundColor: '#afddfc'
-      }}
+      className="w-full touch-none bg-blue-300"
     />
   );
 }

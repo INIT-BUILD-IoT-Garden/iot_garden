@@ -1,214 +1,166 @@
-import { useEffect, useState, useRef } from 'react'
-import { SensorCard } from './SensorCard'
-import { SensorData, SensorDataPoint } from '@/types/sensors'
-import { generateMockData } from '@/services/mockData'
-import { StatusCard } from './StatusCard'
-import { WeatherSummary } from './WeatherSummary'
-import { AlertCard } from './AlertCard'
-import Masonry from 'react-masonry-css';
+import { useEffect, useState } from "react";
+import { SensorCard } from "./SensorCard";
+import { SensorData, SensorDataPoint } from "../types/sensors";
+import { generateMockData } from "../services/mockData";
+import { StatusCard } from "./StatusCard";
+import { WeatherSummary } from "./WeatherSummary";
+import { AlertCard } from "./AlertCard";
+import Masonry from "react-masonry-css";
+import { GardenBackground } from "./GardenBackground";
 
-interface DashboardProps {
-  activeSection: 'hero' | 'dashboard';
-  setActiveSection: (section: 'hero' | 'dashboard') => void;
-}
+const SENSOR_CONFIGS = [
+  {
+    title: "Soil Temperature",
+    key: "soil_temperature" as const,
+    unit: "°C",
+    color: "#ef4444",
+  },
+  {
+    title: "Soil Moisture",
+    key: "soil_moisture" as const,
+    unit: "raw",
+    color: "#3b82f6",
+  },
+  {
+    title: "Air Temperature",
+    key: "air_temperature" as const,
+    unit: "°C",
+    color: "#f97316",
+  },
+  {
+    title: "Humidity",
+    key: "humidity" as const,
+    unit: "%",
+    color: "#06b6d4",
+  },
+  {
+    title: "CO2 Levels",
+    key: "co2" as const,
+    unit: "ppm",
+    color: "#84cc16",
+  },
+  {
+    title: "TVOC",
+    key: "tvoc" as const,
+    unit: "ppb",
+    color: "#8b5cf6",
+  },
+];
 
-export function Dashboard({ activeSection, setActiveSection }: DashboardProps) {
-  const dashboardRef = useRef<HTMLDivElement>(null);
-  const lastScrollPosition = useRef(0);
+export function Dashboard() {
+  const [sensorHistory, setSensorHistory] = useState<SensorData[]>([]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!dashboardRef.current) return;
-      
-      const currentScroll = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const scrollingDown = currentScroll > lastScrollPosition.current;
-      const scrollingUp = currentScroll < lastScrollPosition.current;
-      
-      // Get total scrollable height and footer height
-      const totalHeight = document.documentElement.scrollHeight;
-      const footerHeight = 130; // Match your footer height
-      const footerThreshold = totalHeight - viewportHeight - footerHeight;
-      
-      // Don't trigger snapping if we're in the footer area
-      if (currentScroll > footerThreshold) {
-        lastScrollPosition.current = currentScroll;
-        return;
-      }
-      
-      // Thresholds for both directions
-      const downThreshold = viewportHeight * 0.01;
-      const upThreshold = viewportHeight * 0.99;
-      
-      // Snap to dashboard when scrolling down (but not into footer)
-      if (scrollingDown && currentScroll > downThreshold && currentScroll < footerThreshold) {
-        dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
-        setActiveSection('dashboard');
-      }
-      // Allow hero section to handle upward snap
-      else if (scrollingUp && currentScroll < upThreshold) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setActiveSection('hero');
-      }
-      
-      lastScrollPosition.current = currentScroll;
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [setActiveSection]);
-
-  const [sensorHistory, setSensorHistory] = useState<SensorData[]>([])
-  
   useEffect(() => {
     // Simulate real-time data updates
     const interval = setInterval(() => {
-      setSensorHistory(prev => {
-        const newData = generateMockData()
-        return [...prev, newData].slice(-30) // Keep last 30 readings
-      })
-    }, 2000)
+      setSensorHistory((prev) => {
+        const newData = generateMockData();
+        return [...prev, newData].slice(-10); // Keep last 10 readings
+      });
+    }, 2000);
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   const formatHistoryData = (key: keyof SensorData): SensorDataPoint[] => {
-    return sensorHistory.map(data => ({
+    return sensorHistory.map((data) => ({
       value: data[key] as number,
-      timestamp: data.timestamp
-    }))
-  }
+      timestamp: data.timestamp,
+    }));
+  };
 
   const mockAlerts = [
     {
-      id: '1',
-      type: 'warning' as const,
-      message: 'Soil moisture levels are below recommended threshold',
-      timestamp: new Date().toISOString()
+      id: "1",
+      type: "warning" as const,
+      message: "Soil moisture levels are below recommended threshold",
+      timestamp: new Date().toISOString(),
     },
     {
-      id: '2',
-      type: 'info' as const,
-      message: 'Laboris deserunt dolore incididunt officia non amet id commodo velit voluptate eu.',
-      timestamp: new Date(Date.now() - 3600000).toISOString()
-    }
-  ]
+      id: "2",
+      type: "info" as const,
+      message:
+        "Laboris deserunt dolore incididunt officia non amet id commodo velit voluptate eu.",
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+    },
+  ];
 
   return (
-    <div 
-      ref={dashboardRef} 
-      className="min-h-screen w-full pb-[130px]"
-    >
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8 text-center">Green Campus Garden</h1>
-        
-        {/* Status Cards */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <Masonry
-            breakpointCols={{
-              default: 3,
-              1024: 2,
-              640: 1
-            }}
-            className="flex -ml-4 w-auto"
-            columnClassName="pl-4 bg-clip-padding"
-          >
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <StatusCard
-                title="System Status"
-                status="online"
-                lastUpdate={new Date().toLocaleString()}
-              />
-            </div>
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <StatusCard
-                title="Sensor Network"
-                status="online"
-                lastUpdate={new Date().toLocaleString()}
-              />
-            </div>
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <WeatherSummary />
-            </div>
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <AlertCard alerts={mockAlerts} />
-            </div>
-          </Masonry>
-        </div>
+    <div className="relative">
+      {/* Full-width background */}
+      <div className="sticky top-0 h-screen w-full">
+        <GardenBackground />
+      </div>
+      
+      {/* Content container with grid */}
+      <div className="relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-5">
+          {/* Left column - empty for nav */}
+          <div className="hidden md:block" />
+          
+          {/* Main content column */}
+          <div className="col-span-1 md:col-span-3 px-6 py-8">
+            <h1 className="mb-8 text-center text-4xl font-bold">
+              Green Campus Garden
+            </h1>
 
-        {/* Sensor Cards */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <Masonry
-            breakpointCols={{
-              default: 3,
-              1024: 2,
-              640: 1
-            }}
-            className="flex -ml-4 w-auto"
-            columnClassName="pl-4 bg-clip-padding"
-          >
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <SensorCard
-                title="Soil Temperature"
-                value={sensorHistory[sensorHistory.length - 1]?.soil_temperature ?? 0}
-                unit="°C"
-                data={formatHistoryData('soil_temperature')}
-                color="#ef4444"
-              />
+            {/* Masonry grid */}
+            <div className="-z-10 mx-auto mb-8 p-4">
+              <Masonry
+                breakpointCols={{
+                  default: 3,
+                  1024: 2,
+                  640: 1,
+                }}
+                className="-ml-4 flex w-auto"
+                columnClassName="pl-4 bg-clip-padding"
+              >
+                {[
+                  <StatusCard
+                    key="system"
+                    title="System Status"
+                    status="online"
+                    lastUpdate={new Date().toLocaleString(undefined, { hour: 'numeric', minute: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric' })}                />,
+                  <StatusCard
+                    key="network"
+                    title="Sensor Network"
+                    status="online"
+                    lastUpdate={new Date().toLocaleString(undefined, { hour: 'numeric', minute: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric' })}
+                  />,
+                  <WeatherSummary key="weather" />,
+                  <AlertCard key="alerts" alerts={mockAlerts} />,
+                ].map((card, index) => (
+                  <div
+                    key={index}
+                    className="mb-4 rounded-xl border border-black/30 bg-white/30 p-4 shadow-lg backdrop-blur-sm"
+                  >
+                    {card}
+                  </div>
+                ))}
+
+                {/* Sensor Cards */}
+                {SENSOR_CONFIGS.map(({ title, key, unit, color }) => (
+                  <div
+                    key={key}
+                    className="mb-4 rounded-xl border border-black/30 bg-white/30 p-4 shadow-lg backdrop-blur-sm"
+                  >
+                    <SensorCard
+                      title={title}
+                      value={sensorHistory[sensorHistory.length - 1]?.[key] ?? 0}
+                      unit={unit}
+                      data={formatHistoryData(key)}
+                      color={color}
+                    />
+                  </div>
+                ))}
+              </Masonry>
             </div>
-            
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <SensorCard
-                title="Soil Moisture"
-                value={sensorHistory[sensorHistory.length - 1]?.soil_moisture ?? 0}
-                unit="raw"
-                data={formatHistoryData('soil_moisture')}
-                color="#3b82f6"
-              />
-            </div>
-            
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <SensorCard
-                title="Air Temperature"
-                value={sensorHistory[sensorHistory.length - 1]?.air_temperature ?? 0}
-                unit="°C"
-                data={formatHistoryData('air_temperature')}
-                color="#f97316"
-              />
-            </div>
-            
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <SensorCard
-                title="Humidity"
-                value={sensorHistory[sensorHistory.length - 1]?.humidity ?? 0}
-                unit="%"
-                data={formatHistoryData('humidity')}
-                color="#06b6d4"
-              />
-            </div>
-            
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <SensorCard
-                title="CO2 Levels"
-                value={sensorHistory[sensorHistory.length - 1]?.co2 ?? 0}
-                unit="ppm"
-                data={formatHistoryData('co2')}
-                color="#84cc16"
-              />
-            </div>
-            
-            <div className="mb-4 backdrop-blur-sm bg-white/30 rounded-xl border border-white/20 shadow-lg p-4">
-              <SensorCard
-                title="TVOC"
-                value={sensorHistory[sensorHistory.length - 1]?.tvoc ?? 0}
-                unit="ppb"
-                data={formatHistoryData('tvoc')}
-                color="#8b5cf6"
-              />
-            </div>
-          </Masonry>
+          </div>
+          
+          {/* Right column - empty */}
+          <div className="hidden md:block" />
         </div>
       </div>
     </div>
-  )
+  );
 }
