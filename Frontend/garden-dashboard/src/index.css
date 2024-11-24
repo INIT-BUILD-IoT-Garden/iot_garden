@@ -14,6 +14,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --current-section: "hero";
 }
 
 a {
@@ -89,13 +91,15 @@ button:focus-visible {
   will-change: transform;
 }
 
-.wing-left, .wing-right {
+.wing-left,
+.wing-right {
   transform-origin: center;
   transform-box: fill-box;
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 2rem; /* Adjusts for any fixed headers */
 }
 
 .snap-y {
@@ -105,4 +109,24 @@ html {
 .snap-start {
   scroll-snap-align: start;
   scroll-snap-stop: always;
+}
+
+.scroll-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Add support for :in-viewport pseudo-class */
+@supports (selector(:in-viewport)) {
+  section:in-viewport {
+    view-timeline-name: --section;
+    view-timeline-axis: block;
+  }
+}
+
+/* Fallback for browsers that don't support :in-viewport */
+@supports not (selector(:in-viewport)) {
+  .scroll-section {
+    scroll-margin-top: 0;
+  }
 }
