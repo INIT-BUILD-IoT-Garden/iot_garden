@@ -9,38 +9,77 @@ const menuItems = [
   { title: "Instagram", href: "https://www.instagram.com/" },
 ];
 
-export function NavBar() {
+interface NavBarProps {
+  isAboutPage?: boolean;
+}
+
+export function NavBar({ isAboutPage = false }: NavBarProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("hero");
+  const [activeSection, setActiveSection] = useState(isAboutPage ? "about" : "hero");
   
-  // Update active section when hash changes
+  const updateActiveSection = (section: string) => {
+    setActiveSection(section);
+    if (!isAboutPage) {
+      window.history.replaceState(null, "", `#${section}`);
+    }
+  };
+
+  // Update active section when hash changes - only for home page
   useEffect(() => {
+    if (isAboutPage) return;
+
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1) || "hero";
       setActiveSection(hash);
     };
 
-    // Initial check
     handleHashChange();
-
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
+  }, [isAboutPage]);
 
-  // Use the callback to update active section and URL hash
+  // Use the callback to update active section and URL hash - only for home page
   const isDashboardVisible = useIntersectionObserver("dashboard", (isVisible) => {
+    if (isAboutPage) return;
+    
     if (isVisible) {
-      setActiveSection("dashboard");
-      window.history.replaceState(null, "", "#dashboard");
+      updateActiveSection("dashboard");
     } else {
       const heroSection = document.getElementById("hero");
       const heroRect = heroSection?.getBoundingClientRect();
-      if (heroRect && heroRect.top >= -window.innerHeight / 2) {
-        setActiveSection("hero");
-        window.history.replaceState(null, "", "#hero");
+      const dashboardSection = document.getElementById("dashboard");
+      const dashboardRect = dashboardSection?.getBoundingClientRect();
+      
+      // Check if we're scrolling up and hero section is more visible
+      if (heroRect && dashboardRect && 
+          heroRect.top >= -window.innerHeight / 2 && 
+          dashboardRect.top > window.innerHeight / 2) {
+        updateActiveSection("hero");
       }
     }
   });
+
+  const handleNavigation = (href: string) => {
+    if (href.startsWith('#')) {
+      if (isAboutPage) {
+        // Store the target section in sessionStorage before navigation
+        const targetSection = href.slice(1);
+        sessionStorage.setItem('scrollTarget', targetSection);
+        window.location.href = '/';
+      } else {
+        const sectionId = href.slice(1);
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth' });
+          updateActiveSection(sectionId);
+        }
+      }
+    } else if (href === '/about') {
+      window.location.href = href;
+    } else if (href.startsWith('https://')) {
+      window.open(href, '_blank');
+    }
+  };
 
   return (
     <>
@@ -79,7 +118,11 @@ export function NavBar() {
               <a
                 href={item.href}
                 className="text-xl font-medium text-white"
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavigation(item.href);
+                  setIsOpen(false);
+                }}
               >
                 {item.title}
               </a>
@@ -97,11 +140,17 @@ export function NavBar() {
       >
         <div className="relative flex flex-col items-start gap-5">
           {menuItems.map((item) => {
-            const isActive = activeSection === item.href.replace("#", "");
+            const isActive = isAboutPage 
+              ? item.href === "/about"
+              : activeSection === item.href.replace("#", "");
             return (
               <div key={item.title} className="group relative">
                 <a
                   href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavigation(item.href);
+                  }}
                   className={`text-lg font-semibold transition-colors hover:opacity-90 ${
                     isDashboardVisible ? "text-black" : "text-white"
                   }`}
