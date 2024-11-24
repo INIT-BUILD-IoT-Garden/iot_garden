@@ -3,10 +3,10 @@ import { Separator } from "./ui/Separator";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver";
 
 const menuItems = [
-  { title: "Home", href: "#" },
-  { title: "About", href: "#" },
-  { title: "Services", href: "#" },
-  { title: "Contact", href: "#" },
+  { title: "Home", href: "#hero" },
+  { title: "Dashboard", href: "#dashboard" },
+  { title: "About", href: "/about" },
+  { title: "Instagram", href: "https://www.instagram.com/" },
 ];
 
 export function NavBar() {
