@@ -7,15 +7,15 @@ import { useEffect } from "react";
 export function Home() {
   useEffect(() => {
     // Check if there's a stored scroll target
-    const scrollTarget = sessionStorage.getItem('scrollTarget');
+    const scrollTarget = sessionStorage.getItem("scrollTarget");
     if (scrollTarget) {
       // Clear the stored target
-      sessionStorage.removeItem('scrollTarget');
+      sessionStorage.removeItem("scrollTarget");
       // Wait for the page to fully render
       setTimeout(() => {
         const targetSection = document.getElementById(scrollTarget);
         if (targetSection) {
-          targetSection.scrollIntoView({ behavior: 'smooth' });
+          targetSection.scrollIntoView({ behavior: "smooth" });
         }
       }, 100);
     }
@@ -30,7 +30,7 @@ export function Home() {
           <div className="col-span-1 md:col-span-3" />
           <div className="hidden md:block" />
         </div>
-        
+
         <section id="hero" className="h-screen scroll-section">
           <HeroSection />
         </section>
