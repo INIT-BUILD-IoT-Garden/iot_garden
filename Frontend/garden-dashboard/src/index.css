@@ -121,3 +121,22 @@ html {
     scroll-margin-top: 0;
   }
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-x: hidden; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Ensure the root and body still allow scrolling behavior */
+html, 
+body, 
+#root {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
