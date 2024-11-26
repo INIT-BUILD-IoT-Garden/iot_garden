@@ -17,10 +17,10 @@ export function SensorCard({ title, value, unit, data, color = "#10b981" }: Sens
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">
+        <div className="text-xl font-bold">
           {value.toFixed(2)} {unit}
         </div>
-        <div className="h-[200px] mt-4">
+        <div className="h-[150px] mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <XAxis 
@@ -30,16 +30,17 @@ export function SensorCard({ title, value, unit, data, color = "#10b981" }: Sens
               />
               <YAxis 
                 stroke="#888888"
-                tickLine={false}
-                axisLine={false}
+                tickLine={true}
+                axisLine={true}
                 tickFormatter={(value) => `${value}`}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "rgba(255, 255, 255, 0.9)",
+                  backgroundColor: "white",
                   border: "1px solid #ccc",
                 }}
                 labelFormatter={(label) => new Date(label).toLocaleTimeString()}
+                wrapperStyle={{ zIndex: 1000 }}
               />
               <Line
                 type="monotone"
