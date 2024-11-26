@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { SensorCard } from "./SensorCard";
-import { SensorData, SensorDataPoint } from "../types/sensors";
+import Masonry from "react-masonry-css";
+
 import { generateMockData } from "../services/mockData";
+import { SensorData, SensorDataPoint } from "../types/sensors";
+import { AlertCard } from "./AlertCard";
+import { GardenBackground } from "./GardenBackground";
+import { SensorCard } from "./SensorCard";
 import { StatusCard } from "./StatusCard";
 import { WeatherSummary } from "./WeatherSummary";
-import { AlertCard } from "./AlertCard";
-import Masonry from "react-masonry-css";
-import { GardenBackground } from "./GardenBackground";
 
 const SENSOR_CONFIGS = [
   {
@@ -91,13 +92,13 @@ export function Dashboard() {
       <div className="sticky top-0 h-screen w-full">
         <GardenBackground />
       </div>
-      
+
       {/* Content container with grid */}
       <div className="relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-5">
           {/* Left column - empty for nav */}
           <div className="hidden md:block" />
-          
+
           {/* Main content column */}
           <div className="col-span-1 md:col-span-3 px-6 py-8">
             <h1 className="mb-8 text-center text-4xl font-bold">
@@ -108,7 +109,7 @@ export function Dashboard() {
             <div className="-z-10 mx-auto mb-8 p-4">
               <Masonry
                 breakpointCols={{
-                  default: 3,
+                  default: 2,
                   1024: 2,
                   640: 1,
                 }}
@@ -120,12 +121,25 @@ export function Dashboard() {
                     key="system"
                     title="System Status"
                     status="online"
-                    lastUpdate={new Date().toLocaleString(undefined, { hour: 'numeric', minute: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric' })}                />,
+                    lastUpdate={new Date().toLocaleString(undefined, {
+                      hour: "numeric",
+                      minute: "numeric",
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                    })}
+                  />,
                   <StatusCard
                     key="network"
                     title="Sensor Network"
                     status="online"
-                    lastUpdate={new Date().toLocaleString(undefined, { hour: 'numeric', minute: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric' })}
+                    lastUpdate={new Date().toLocaleString(undefined, {
+                      hour: "numeric",
+                      minute: "numeric",
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                    })}
                   />,
                   <WeatherSummary key="weather" />,
                   <AlertCard key="alerts" alerts={mockAlerts} />,
@@ -146,7 +160,9 @@ export function Dashboard() {
                   >
                     <SensorCard
                       title={title}
-                      value={sensorHistory[sensorHistory.length - 1]?.[key] ?? 0}
+                      value={
+                        sensorHistory[sensorHistory.length - 1]?.[key] ?? 0
+                      }
                       unit={unit}
                       data={formatHistoryData(key)}
                       color={color}
@@ -156,7 +172,7 @@ export function Dashboard() {
               </Masonry>
             </div>
           </div>
-          
+
           {/* Right column - empty */}
           <div className="hidden md:block" />
         </div>

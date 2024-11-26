@@ -6,7 +6,7 @@ const menuItems = [
   { title: "Home", href: "#hero" },
   { title: "Dashboard", href: "#dashboard" },
   { title: "About", href: "/about" },
-  { title: "Instagram", href: "https://www.instagram.com/" },
+  { title: "Instagram", href: "https://www.instagram.com/gcifiu" },
 ];
 
 interface NavBarProps {

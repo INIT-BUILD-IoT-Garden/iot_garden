@@ -19,7 +19,7 @@ export function GardenBackground() {
     }
 
     // Initialize grass blades
-    const BLADE_COUNT = 400;
+    const BLADE_COUNT = 1000;
     const GRASS_COLORS = [
       { light: "#22c55e", dark: "#2d5a27" },
       { light: "#16a34a", dark: "#2d5a27" },
