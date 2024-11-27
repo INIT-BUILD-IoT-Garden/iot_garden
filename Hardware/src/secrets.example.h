@@ -1,10 +1,12 @@
-   // secrets.example.h
-   #ifndef SECRETS_H
-   #define SECRETS_H
+#include "secrets.h"
 
-   const char* ssid = "your_ssid";
-   const char* password = "your_password";
-   const char* identity = "your_identity";  // For WPA2 Enterprise
-   const char* mqtt_server = "your_mqtt_server_ip";
+   // Network 1 - WPA2 Enterprise (eduroam)
+   const char* ssid1 = "";
+   const char* password1 = "";
+   const char* identity1 = "";  // For WPA2 Enterprise
+   const char* mqtt_server1 = "";
 
-   #endif
+   // Network 2 - Regular WiFi
+   const char* ssid2 = "";
+   const char* password2 = "";
+   const char* mqtt_server2 = "";  // nullptr will use gateway IP
