@@ -15,6 +15,9 @@ private:
     WiFiManager& wifiManager;
     const char* mqtt_topic;
     const int mqtt_port;
+    void (*messageCallback)(const char*) = nullptr;
+    
+    void printConnectionState();
 
 public:
     MQTTManager(WiFiManager& wifiMgr, const char* topic, int port = 1883);
@@ -22,6 +25,8 @@ public:
     bool publish(const SensorData& data);
     void loop();
     bool isConnected() { return client.connected(); }
+    bool subscribe(const char* topic, void (*callback)(const char*));
+    bool publish(const char* topic, const char* payload);
 };
 
 #endif
