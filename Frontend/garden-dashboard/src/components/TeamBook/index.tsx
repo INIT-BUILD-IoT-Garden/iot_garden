@@ -1,12 +1,17 @@
 import { TeamMember } from "@/data/teamMembers";
-import { Environment, Float, PresentationControls, Html } from "@react-three/drei";
+import { animated, useSpring } from "@react-spring/three";
+import {
+  Environment,
+  Float,
+  Html,
+  PresentationControls,
+} from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Provider as JotaiProvider } from "jotai";
 import { useAtom } from "jotai";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { useSpring, animated } from '@react-spring/three';
 
 import { Book } from "./Book";
 import { LeafGeometry } from "./LeafGeometry";
@@ -36,6 +41,21 @@ export function TeamBook({ members }: TeamBookProps) {
 }
 
 function TeamBookContent({ members }: TeamBookProps) {
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const updateSize = () => {
+      const width = window.innerWidth;
+      // Calculate height based on width to maintain aspect ratio
+      const height = width < 768 ? width * 1.2 : width * 0.6;
+      setContainerSize({ width, height: Math.min(height, 700) });
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
   if (!members) {
     throw new Error("Members prop is undefined");
   }
@@ -88,35 +108,49 @@ function TeamBookContent({ members }: TeamBookProps) {
   const [rightClicked, setRightClicked] = useState(false);
 
   const leftLeafSpring = useSpring({
-    rotation: leftClicked ? [5.35, 0.2, -Math.PI / 3.1] : [5.5, 0, -Math.PI / 2.6],
+    rotation: leftClicked
+      ? [5.35, 0.2, -Math.PI / 3.1]
+      : [5.5, 0, -Math.PI / 2.6],
     scale: leftClicked ? 1.2 : 1,
-    config: { tension: 300, friction: 10 }
+    config: { tension: 300, friction: 10 },
   });
 
   const rightLeafSpring = useSpring({
-    rotation: rightClicked ? [5.35, -0.2, Math.PI / 1.6] : [5.5, 0, Math.PI / 1.6],
+    rotation: rightClicked
+      ? [5.35, -0.2, Math.PI / 1.6]
+      : [5.5, 0, Math.PI / 1.6],
     scale: rightClicked ? 1.2 : 1,
-    config: { tension: 300, friction: 10 }
+    config: { tension: 300, friction: 10 },
   });
 
   return (
-    <div className="h-[700px] w-full" style={{ touchAction: "none" }}>
+    <div
+      className="w-full"
+      style={{
+        height: containerSize.height,
+        touchAction: "none",
+      }}
+    >
       <ErrorBoundary fallback={<div>Error loading 3D scene</div>}>
         <Suspense fallback={<div>Loading 3D scene...</div>}>
           <Canvas
             camera={{
-              fov: 45,
+              fov: containerSize.width < 768 ? 48 : 44,
               near: 0.1,
               far: 2000,
-              position: [0, 2.5, 3],
+              position: [
+                0,
+                containerSize.width < 768 ? 3.5 : 2.5,
+                containerSize.width < 768 ? 4 : 3,
+              ],
             }}
             shadows
           >
             <PresentationControls
               global
-              rotation={[0, 0.1, 0]}
-              polar={[-0.05, 0.05]}
-              azimuth={[-0.05, 0.05]}
+              rotation={[0, 0, 0]}
+              polar={[-0.01, 0.01]}
+              azimuth={[-0.01, 0.01]}
               config={{ mass: 8, tension: 400 }}
               snap={{ mass: 8, tension: 400 }}
             >
@@ -126,22 +160,23 @@ function TeamBookContent({ members }: TeamBookProps) {
                 speed={2}
                 rotationIntensity={1}
               >
-                {console.log(
-                  "About to render Book component with pages:",
-                  pages,
+                {pages && pages.length > 0 && (
+                  <>
+                    {console.log("About to render Book component with pages:", pages)}
+                    <Book pages={pages} />
+                  </>
                 )}
-                {pages && pages.length > 0 && <Book pages={pages} />}
               </Float>
             </PresentationControls>
             <Environment preset="forest" />
-            <directionalLight position={[2, 5, 2]} intensity={1.5} castShadow />
+            <directionalLight position={[2, 5, 2]} intensity={1.0} castShadow />
             <mesh position-y={-1.5} rotation-x={-Math.PI / 2} receiveShadow>
               <planeGeometry args={[100, 100]} />
               <shadowMaterial transparent opacity={0.2} />
             </mesh>
 
             {/* Navigation buttons */}
-            <group position={[0, -3.2, 0.12]}>
+            <group position={[0, -3.0, 0.12]}>
               {/* Left Leaf Button */}
               <animated.mesh
                 position={[-0.9, 1, 0]}
@@ -158,13 +193,13 @@ function TeamBookContent({ members }: TeamBookProps) {
                 onPointerEnter={(e) => {
                   if (!isFirstPage) {
                     e.stopPropagation();
-                    document.body.style.cursor = 'pointer';
+                    document.body.style.cursor = "pointer";
                     setLeftHovered(true);
                   }
                 }}
                 onPointerLeave={(e) => {
                   e.stopPropagation();
-                  document.body.style.cursor = 'auto';
+                  document.body.style.cursor = "auto";
                   setLeftHovered(false);
                 }}
                 rotation={leftLeafSpring.rotation}
@@ -172,7 +207,13 @@ function TeamBookContent({ members }: TeamBookProps) {
               >
                 <primitive object={new LeafGeometry()} />
                 <meshStandardMaterial
-                  color={isFirstPage ? "#666666" : (leftHovered ? "#3d7a37" : "#2d5a27")}
+                  color={
+                    isFirstPage
+                      ? "#666666"
+                      : leftHovered
+                        ? "#3d7a37"
+                        : "#2d5a27"
+                  }
                   roughness={0.5}
                   metalness={0.1}
                   opacity={isFirstPage ? 0.1 : 1}
@@ -204,13 +245,13 @@ function TeamBookContent({ members }: TeamBookProps) {
                 onPointerEnter={(e) => {
                   if (!isLastPage) {
                     e.stopPropagation();
-                    document.body.style.cursor = 'pointer';
+                    document.body.style.cursor = "pointer";
                     setRightHovered(true);
                   }
                 }}
                 onPointerLeave={(e) => {
                   e.stopPropagation();
-                  document.body.style.cursor = 'auto';
+                  document.body.style.cursor = "auto";
                   setRightHovered(false);
                 }}
                 rotation={rightLeafSpring.rotation}
@@ -218,7 +259,13 @@ function TeamBookContent({ members }: TeamBookProps) {
               >
                 <primitive object={new LeafGeometry()} />
                 <meshStandardMaterial
-                  color={isLastPage ? "#666666" : (rightHovered ? "#3d7a37" : "#2d5a27")}
+                  color={
+                    isLastPage
+                      ? "#666666"
+                      : rightHovered
+                        ? "#3d7a37"
+                        : "#2d5a27"
+                  }
                   roughness={0.5}
                   metalness={0.1}
                   opacity={isLastPage ? 0.1 : 1}

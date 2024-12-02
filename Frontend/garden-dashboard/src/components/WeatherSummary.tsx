@@ -73,8 +73,8 @@ export function WeatherSummary() {
   }
 
   return (
-    <div className="h-[200px] w-full flex flex-col">
-      <h2 className="text-xl font-semibold mb-2">Current Weather in Sweetwater</h2>
+    <div className="h-auto w-full flex flex-col">
+      <h2 className="text-lg lg:text-xl font-semibold mb-2">Current Weather in Sweetwater</h2>
       {weatherData && (
         <div className="flex-1 flex flex-col justify-between">
           <div>
@@ -83,15 +83,15 @@ export function WeatherSummary() {
                 <img 
                   src={`https://openweathermap.org/img/wn/${weatherData.iconCode}@2x.png`}
                   alt={weatherData.description}
-                  className="w-16 h-16"
+                  className="w-12 h-12 lg:w-16 lg:h-16"
                 />
               </div>
-              <p className="text-3xl font-bold">{weatherData.temperature}°F</p>
+              <p className="text-2xl font-bold">{weatherData.temperature}°F</p>
             </div>
             <p className="capitalize">{weatherData.description}</p>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div>
               <p className="text-sm text-gray-600">Humidity</p>
               <p className="font-semibold">{weatherData.humidity}%</p>

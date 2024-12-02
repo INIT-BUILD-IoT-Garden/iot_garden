@@ -105,29 +105,6 @@ const pageMaterials = [
   }),
 ];
 
-// interface PageProps {
-//   number: number;
-//   front: {
-//     content: string | {
-//       name?: string;
-//       role?: string;
-//       bio?: string;
-//     };
-//     type: "cover" | "bio" | "image";
-//   };
-//   back: {
-//     content: string | {
-//       name?: string;
-//       role?: string;
-//       bio?: string;
-//     };
-//     type: "cover" | "bio" | "image";
-//   };
-//   page: number;
-//   opened: boolean;
-//   bookClosed: boolean;
-//   totalPages: number;
-// }
 
 function createTextTexture(content: { name: string; role: string; bio: string }) {
   const canvas = document.createElement('canvas');
@@ -146,17 +123,17 @@ function createTextTexture(content: { name: string; role: string; bio: string })
   ctx.textAlign = 'center';
   
   // Name
-  ctx.font = 'bold 48px Arial';
+  ctx.font = 'bold 74px Arial';
   ctx.fillText(content.name, canvas.width / 2, 100);
   
   // Role
-  ctx.font = '32px Arial';
-  ctx.fillStyle = '#666';
+  ctx.font = '50px Arial';
+  ctx.fillStyle = '#111';
   ctx.fillText(content.role, canvas.width / 2, 160);
   
   // Bio (with word wrap)
-  ctx.font = '24px Arial';
-  ctx.fillStyle = '#333';
+  ctx.font = '34px Arial';
+  ctx.fillStyle = '#222';
   const maxWidth = 800;
   const lineHeight = 36;
   const words = content.bio.split(' ');
@@ -273,7 +250,7 @@ const Page = ({
     mesh.add(skeleton.bones[0]);
     mesh.bind(skeleton);
     return mesh;
-  }, [frontTexture, backTexture, front.type, back.type]);
+  }, [frontTexture, backTexture, front.type, front.content] );
 
   // useHelper(skinnedMeshRef, SkeletonHelper, "red");
 
@@ -282,7 +259,7 @@ const Page = ({
       return;
     }
 
-    const emissiveIntensity = highlighted ? 0.1 : 0;
+    const emissiveIntensity = highlighted ? 0.05 : 0;
     skinnedMeshRef.current.material[4].emissiveIntensity =
       skinnedMeshRef.current.material[5].emissiveIntensity = MathUtils.lerp(
         skinnedMeshRef.current.material[4].emissiveIntensity,
@@ -347,7 +324,7 @@ const Page = ({
   });
 
   const [_, setPage] = useAtom(pageAtom);
-  useCursor(highlighted);
+  useCursor(highlighted, 'zoom-in', 'auto');
 
   return (
     <group
