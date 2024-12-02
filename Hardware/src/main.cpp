@@ -11,6 +11,8 @@
 #define MQ8_PIN 34
 #define RX_PIN 16
 #define TX_PIN 17
+#define SDS_RX_PIN 25
+#define SDS_TX_PIN 26
 
 // MQTT Topics
 const char* COMMAND_TOPIC = "/home/sensors/command";
@@ -18,7 +20,7 @@ const char* STATUS_TOPIC = "/home/sensors/status";
 const char* LOG_TOPIC = "/home/sensors/logs";
 
 // Create managers
-SensorManager sensors(DHTPIN, MQ8_PIN, RX_PIN, TX_PIN);
+SensorManager sensors(DHTPIN, MQ8_PIN, RX_PIN, TX_PIN, SDS_RX_PIN, SDS_TX_PIN);
 WiFiManager wifiManager;
 MQTTManager mqtt(wifiManager, "/home/sensors");
 LEDManager led(LED_PIN);
@@ -96,43 +98,52 @@ void setup() {
 }
 
 void loop() {
+    // First ensure WiFi is connected
     if (!wifiManager.checkConnection()) {
         logger.println("Attempting to reconnect WiFi...");
         if (!wifiManager.connect()) {
             delay(5000);
             return;
         }
+        // Give time for WiFi to fully establish
+        delay(1000);
     }
 
-    mqtt.loop();
-    if (!mqtt.isConnected()) {
-        logger.println("Attempting to reconnect MQTT...");
-        if (!mqtt.connect()) {
-            delay(5000);
-            return;
-        }
-    }
-
-    if (wifiManager.isWiFiConnected() && mqtt.isConnected()) {
-        // Publish status updates periodically
-        if (millis() - lastStatusUpdate >= statusInterval) {
-            publishStatus();
-            lastStatusUpdate = millis();
-        }
-        
-        // Only read and publish sensor data if device is enabled
-        if (deviceEnabled) {
-            SensorData data = sensors.readSensors();
-            sensors.printReadings(data);
-            
-            if (mqtt.publish(data)) {
-                led.blink(1);  // Success
-            } else {
-                led.blink(3);  // Failure
+    // Only attempt MQTT operations if WiFi is connected
+    if (wifiManager.isWiFiConnected()) {
+        mqtt.loop();
+        if (!mqtt.isConnected()) {
+            logger.println("Attempting to reconnect MQTT...");
+            if (!mqtt.connect()) {
+                delay(5000);
+                return;
             }
+            // Give time for MQTT to fully establish
+            delay(1000);
         }
-        
-        delay(2000);
+
+        // Only proceed with sensor operations if both WiFi and MQTT are connected
+        if (mqtt.isConnected()) {
+            // Publish status updates periodically
+            if (millis() - lastStatusUpdate >= statusInterval) {
+                publishStatus();
+                lastStatusUpdate = millis();
+            }
+            
+            // Only read and publish sensor data if device is enabled
+            if (deviceEnabled) {
+                SensorData data = sensors.readSensors();
+                sensors.printReadings(data);
+                
+                if (mqtt.publish(data)) {
+                    led.blink(1);  // Success
+                } else {
+                    led.blink(3);  // Failure
+                }
+            }
+            
+            delay(2000);
+        }
     }
     
     led.update();

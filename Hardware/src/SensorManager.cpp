@@ -1,12 +1,15 @@
 #include "SensorManager.h"
 
-SensorManager::SensorManager(int dhtPin, int mq8Pin, int rxPin, int txPin)
+SensorManager::SensorManager(int dhtPin, int mq8Pin, int rxPin, int txPin, int sdsRx, int sdsTx)
     : dht(dhtPin, DHT11)
     , MQ8_PIN(mq8Pin)
     , DHTPIN(dhtPin)
     , RX_PIN(rxPin)
     , TX_PIN(txPin)
+    , SDS_RX_PIN(sdsRx)
+    , SDS_TX_PIN(sdsTx)
     , radar(&Serial2, 9600, rxPin, txPin)
+    , sdsSerial(1)
 {
 }
 
@@ -14,6 +17,15 @@ bool SensorManager::begin() {
     Wire.begin(22, 21);
     Serial2.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);
     dht.begin();
+    
+    // Initialize SDS011 with proper Serial configuration
+    sdsSerial.begin(9600, SERIAL_8N1, SDS_RX_PIN, SDS_TX_PIN);
+    delay(100);  // Give serial time to stabilize
+    sds.begin(&sdsSerial);  // Remove pin parameters, they're already set in serial begin
+    
+    // Wake up the SDS011 sensor
+    sds.wakeup();
+    delay(3000); // Allow SDS011 to stabilize
     
     if (!ccs.begin()) {
         Serial.println("Failed to start CCS811!");
@@ -59,6 +71,27 @@ SensorData SensorManager::readSensors() {
         data.energy = radar.getTargetEnergy();
     }
     
+    // Read SDS011
+    int retries = 3;
+    while (retries > 0) {
+        int error = sds.read(&data.pm25, &data.pm10);
+        if (!error && data.pm25 >= 0 && data.pm10 >= 0) {
+            break;  // Successful reading
+        }
+        retries--;
+        if (retries > 0) {
+            delay(1000);  // Wait 1 second between retries
+            sds.wakeup(); // Ensure sensor is awake
+            delay(100);   // Short delay after wakeup
+        }
+    }
+    
+    if (retries == 0) {
+        data.pm25 = -1;
+        data.pm10 = -1;
+        Serial.println("Error reading from SDS011 after multiple attempts");
+    }
+    
     return data;
 }
 
@@ -92,5 +125,13 @@ void SensorManager::printReadings(const SensorData& data) {
         Serial.print("Target Speed: "); Serial.print(data.speed); Serial.println(" m/s");
         Serial.print("Target Distance: "); Serial.print(data.distance); Serial.println(" m");
         Serial.print("Target Energy: "); Serial.println(data.energy);
+    }
+    
+    Serial.println("\n----- SDS011 Air Quality Readings -----");
+    if (data.pm25 >= 0 && data.pm10 >= 0) {
+        Serial.print("PM2.5: "); Serial.print(data.pm25); Serial.println(" μg/m³");
+        Serial.print("PM10:  "); Serial.print(data.pm10); Serial.println(" μg/m³");
+    } else {
+        Serial.println("Failed to read from SDS011 sensor!");
     }
 } 
