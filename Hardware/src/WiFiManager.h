@@ -6,52 +6,49 @@
 
 class WiFiManager {
 private:
-    // Constants
     static const int MAX_RETRY_COUNT = 3;
     static const unsigned long RETRY_DELAY = 5000; // 5 seconds
     
-    // Network credentials
     struct NetworkCredentials {
         const char* ssid;
         const char* password;
+        const char* identity;    // nullptr for regular WiFi
+        const char* mqtt_server; // MQTT server for this network
+        bool isEnterprise;
     };
     
     NetworkCredentials networks[2];
     int currentNetwork;
     
-    // Status tracking
     bool isConnected;
     unsigned long lastConnectionAttempt;
     int retryCount;
 
-    // Private methods
-    bool connectToNetwork(const char* ssid, const char* password);
+    bool connectToNetwork(const NetworkCredentials& network);
     void resetConnectionStatus();
 
-    // Add to the private section of the WiFiManager class
-    bool isEnterpriseMode;
-    const char* enterpriseIdentity;
-    const char* enterprisePassword;
+    IPAddress getDefaultGateway() const;
+
+    bool testMQTTConnection(const IPAddress& ip) const;
 
 public:
     WiFiManager();
     
-    // Configuration
-    void addNetwork(int index, const char* ssid, const char* password);
+    void addEnterpriseNetwork(int index, const char* ssid, const char* password, 
+                            const char* identity, const char* mqtt_server);
+    void addRegularNetwork(int index, const char* ssid, const char* password, 
+                          const char* mqtt_server);
     
-    // Connection management
     bool connect();
     bool checkConnection();
     void disconnect();
     
-    // Status methods
     bool isWiFiConnected() const { return isConnected; }
     String getCurrentSSID() const { return WiFi.SSID(); }
     int getRSSI() const { return WiFi.RSSI(); }
     IPAddress getLocalIP() const { return WiFi.localIP(); }
-
-    // Add to the public section
-    void configureEnterprise(const char* identity, const char* password);
+    String getCurrentMqttServer() const;
+    String scanForMQTTServer() const;
 };
 
-#endif // WIFI_MANAGER_H
+#endif
