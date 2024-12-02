@@ -19,7 +19,7 @@ export function GardenBackground() {
     }
 
     // Initialize grass blades
-    const BLADE_COUNT = 1000;
+    const BLADE_COUNT = 500;
     const GRASS_COLORS = [
       { light: "#22c55e", dark: "#2d5a27" },
       { light: "#16a34a", dark: "#2d5a27" },
@@ -204,5 +204,5 @@ export function GardenBackground() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="w-full touch-none bg-blue-300" />;
+  return <canvas ref={canvasRef} className="w-full touch-none bg-gradient-to-b from-blue-500 to-blue-300" />;
 }

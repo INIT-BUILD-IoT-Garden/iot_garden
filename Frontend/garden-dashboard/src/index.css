@@ -140,3 +140,7 @@ body,
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
+
+.cursor-magnify {
+  cursor: zoom-in;
+}

@@ -10,6 +10,9 @@ export function AboutUs() {
   useEffect(() => {
     const hash = window.location.hash.slice(1) || "about";
     window.history.replaceState(null, "", "/about");
+    
+    console.log("TeamMembers data:", teamMembers);
+    console.log("TeamMembers structure:", JSON.stringify(teamMembers[0], null, 2));
   }, []);
 
   return (
@@ -32,13 +35,8 @@ export function AboutUs() {
             {/* Left column - empty for nav */}
             <div className="hidden md:block" />
             {/* Main content  4 column */}
-            <div className="col-span-1 px-6 py-32 md:col-span-4">
+            <div className="col-span-1 px-10 py-32 md:col-span-4">
               <div className="rounded-xl border border-black/30 bg-transparent backdrop-blur-sm">
-                {console.log("TeamMembers data:", teamMembers)}
-                {console.log(
-                  "TeamMembers structure:",
-                  JSON.stringify(teamMembers[0], null, 2),
-                )}
                 <Suspense fallback={<div>Loading...</div>}>
                   <TeamBook members={teamMembers} />
                 </Suspense>
