@@ -252,7 +252,9 @@ bool MQTTManager::publish(const SensorData& data) {
     jsonPayload += "\"target_count\":" + String(data.targetCount) + ",";
     jsonPayload += "\"target_speed\":" + String(data.speed) + ",";
     jsonPayload += "\"target_distance\":" + String(data.distance) + ",";
-    jsonPayload += "\"target_energy\":" + String(data.energy);
+    jsonPayload += "\"target_energy\":" + String(data.energy) + ",";
+    jsonPayload += "\"pm25\":" + String(data.pm25) + ",";
+    jsonPayload += "\"pm10\":" + String(data.pm10);
     jsonPayload += "}";
 
     // Check payload size against new buffer size
