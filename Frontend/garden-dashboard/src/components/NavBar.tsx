@@ -126,7 +126,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
               >
                 {item.title}
               </a>
-              <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-white transition-all duration-300 group-hover:w-full" />
+              <span className="absolute -bottom-1 right-0 h-[2px] w-0 bg-white transition-all duration-300 group-hover:w-full" />
             </div>
           ))}
         </div>
@@ -138,7 +138,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
           isDashboardVisible || isAboutPage ? "top-32" : "top-1/3"
         }`}
       >
-        <div className="relative flex flex-col items-start gap-5">
+        <div className="relative flex flex-col items-end gap-5">
           {menuItems.map((item) => {
             const isActive = isAboutPage 
               ? item.href === "/about"
@@ -151,23 +151,23 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
                     e.preventDefault();
                     handleNavigation(item.href);
                   }}
-                  className={`text-lg font-semibold transition-colors hover:opacity-90 ${
+                  className={`text-lg font-semibold  transition-colors hover:opacity-90 ${
                     isDashboardVisible || isAboutPage ? "text-black" : "text-white"
                   }`}
                 >
                   {item.title.toLowerCase()}
                 </a>
                 <span
-                  className={`absolute -bottom-1 left-0 h-[2px] transition-all duration-300 ${
-                    isDashboardVisible || isAboutPage ? "bg-black" : "bg-white"
-                  } ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                  className={`absolute -bottom-1 right-0 h-[2px] transition-all duration-300 
+                    ${isDashboardVisible || isAboutPage ? "bg-black" : "bg-white"} 
+                    ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
                 />
               </div>
             );
           })}
           <Separator
             orientation="vertical"
-            className={`absolute -right-8 top-0 h-full w-[2px] ${
+            className={`absolute -right-3 top-0 h-full w-[2px] ${
               isDashboardVisible || isAboutPage ? "bg-black" : "bg-white"
             }`}
           />

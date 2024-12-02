@@ -47,7 +47,7 @@ export function HeroSection() {
   // console.log("Logo GCI ViewBox:", logoGCIViewBox);
 
   return (
-    <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-black">
+    <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-b from-slate-950 via-slate-950 to-sky-950">
       {/* Stars with random twinkling */}
       <div className="absolute inset-0 z-0">
         {stars.map((star, i) => (
