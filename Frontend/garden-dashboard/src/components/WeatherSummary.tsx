@@ -23,7 +23,7 @@ export function WeatherSummary() {
         const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
         
         const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
         );
         
         if (!response.ok) {
@@ -86,7 +86,7 @@ export function WeatherSummary() {
                   className="w-12 h-12 lg:w-16 lg:h-16"
                 />
               </div>
-              <p className="text-2xl font-bold">{weatherData.temperature}°F</p>
+              <p className="text-2xl font-bold">{weatherData.temperature}°C</p>
             </div>
             <p className="capitalize">{weatherData.description}</p>
           </div>

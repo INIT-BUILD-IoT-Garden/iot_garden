@@ -115,7 +115,7 @@ function createTextTexture(content: { name: string; role: string; bio: string })
   if (!ctx) return null;
 
   // Set background
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Configure text styles
@@ -127,18 +127,18 @@ function createTextTexture(content: { name: string; role: string; bio: string })
   ctx.fillText(content.name, canvas.width / 2, 100);
   
   // Role
-  ctx.font = '50px Arial';
+  ctx.font = '55px Arial';
   ctx.fillStyle = '#111';
-  ctx.fillText(content.role, canvas.width / 2, 160);
+  ctx.fillText(content.role, canvas.width / 2, 190);
   
   // Bio (with word wrap)
-  ctx.font = '34px Arial';
+  ctx.font = '48px Arial';
   ctx.fillStyle = '#222';
-  const maxWidth = 800;
-  const lineHeight = 36;
+  const maxWidth = 750;
+  const lineHeight = 60;
   const words = content.bio.split(' ');
   let line = '';
-  let y = 250;
+  let y = 300;
 
   words.forEach(word => {
     const testLine = line + word + ' ';
@@ -229,7 +229,7 @@ const Page = ({
       new MeshStandardMaterial({
         color: whiteColor,
         map: front.type === "bio" ? bioTexture : frontTexture,
-        roughness: 0.2,
+        roughness: 0.9,
         emissive: emissiveColor,
         emissiveIntensity: 0,
       }),
@@ -237,7 +237,7 @@ const Page = ({
       new MeshStandardMaterial({
         color: whiteColor,
         map: backTexture,
-        roughness: 0.1,
+        roughness: 0.5,
         emissive: emissiveColor,
         emissiveIntensity: 0,
       }),
@@ -259,7 +259,7 @@ const Page = ({
       return;
     }
 
-    const emissiveIntensity = highlighted ? 0.05 : 0;
+    const emissiveIntensity = highlighted ? 0.1 : 0;
     skinnedMeshRef.current.material[4].emissiveIntensity =
       skinnedMeshRef.current.material[5].emissiveIntensity = MathUtils.lerp(
         skinnedMeshRef.current.material[4].emissiveIntensity,

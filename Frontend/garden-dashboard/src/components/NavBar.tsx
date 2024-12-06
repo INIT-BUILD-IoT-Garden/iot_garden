@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/Separator";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { useEffect, useState } from "react";
 
 const menuItems = [
   { title: "Home", href: "#hero" },
@@ -15,8 +15,10 @@ interface NavBarProps {
 
 export function NavBar({ isAboutPage = false }: NavBarProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState(isAboutPage ? "about" : "hero");
-  
+  const [activeSection, setActiveSection] = useState(
+    isAboutPage ? "about" : "hero",
+  );
+
   const updateActiveSection = (section: string) => {
     setActiveSection(section);
     if (!isAboutPage) {
@@ -39,45 +41,51 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
   }, [isAboutPage]);
 
   // Use the callback to update active section and URL hash - only for home page
-  const isDashboardVisible = useIntersectionObserver("dashboard", (isVisible) => {
-    if (isAboutPage) return;
-    
-    if (isVisible) {
-      updateActiveSection("dashboard");
-    } else {
-      const heroSection = document.getElementById("hero");
-      const heroRect = heroSection?.getBoundingClientRect();
-      const dashboardSection = document.getElementById("dashboard");
-      const dashboardRect = dashboardSection?.getBoundingClientRect();
-      
-      // Check if we're scrolling up and hero section is more visible
-      if (heroRect && dashboardRect && 
-          heroRect.top >= -window.innerHeight / 2 && 
-          dashboardRect.top > window.innerHeight / 2) {
-        updateActiveSection("hero");
+  const isDashboardVisible = useIntersectionObserver(
+    "dashboard",
+    (isVisible) => {
+      if (isAboutPage) return;
+
+      if (isVisible) {
+        updateActiveSection("dashboard");
+      } else {
+        const heroSection = document.getElementById("hero");
+        const heroRect = heroSection?.getBoundingClientRect();
+        const dashboardSection = document.getElementById("dashboard");
+        const dashboardRect = dashboardSection?.getBoundingClientRect();
+
+        // Check if we're scrolling up and hero section is more visible
+        if (
+          heroRect &&
+          dashboardRect &&
+          heroRect.top >= -window.innerHeight / 2 &&
+          dashboardRect.top > window.innerHeight / 2
+        ) {
+          updateActiveSection("hero");
+        }
       }
-    }
-  });
+    },
+  );
 
   const handleNavigation = (href: string) => {
-    if (href.startsWith('#')) {
+    if (href.startsWith("#")) {
       if (isAboutPage) {
         // Store the target section in sessionStorage before navigation
         const targetSection = href.slice(1);
-        sessionStorage.setItem('scrollTarget', targetSection);
-        window.location.href = '/';
+        sessionStorage.setItem("scrollTarget", targetSection);
+        window.location.href = "/";
       } else {
         const sectionId = href.slice(1);
         const section = document.getElementById(sectionId);
         if (section) {
-          section.scrollIntoView({ behavior: 'smooth' });
+          section.scrollIntoView({ behavior: "smooth" });
           updateActiveSection(sectionId);
         }
       }
-    } else if (href === '/about') {
+    } else if (href === "/about") {
       window.location.href = href;
-    } else if (href.startsWith('https://')) {
-      window.open(href, '_blank');
+    } else if (href.startsWith("https://")) {
+      window.open(href, "_blank");
     }
   };
 
@@ -134,13 +142,13 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
 
       {/* Desktop Menu */}
       <nav
-        className={`fixed left-[8%] z-50 hidden transition-all duration-500 ease-in-out md:block ${
+        className={`fixed left-12 lg:left-24 xl:left-44 z-50 hidden transition-all duration-500 ease-in-out md:block ${
           isDashboardVisible || isAboutPage ? "top-32" : "top-1/3"
         }`}
       >
         <div className="relative flex flex-col items-end gap-5">
           {menuItems.map((item) => {
-            const isActive = isAboutPage 
+            const isActive = isAboutPage
               ? item.href === "/about"
               : activeSection === item.href.replace("#", "");
             return (
@@ -151,8 +159,10 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
                     e.preventDefault();
                     handleNavigation(item.href);
                   }}
-                  className={`text-lg font-semibold  transition-colors hover:opacity-90 ${
-                    isDashboardVisible || isAboutPage ? "text-black" : "text-white"
+                  className={`text-lg font-semibold hover:text-green-950 transition-colors hover:opacity-90 ${
+                    isDashboardVisible || isAboutPage
+                      ? "text-black"
+                      : "text-white"
                   }`}
                 >
                   {item.title.toLowerCase()}
@@ -167,7 +177,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
           })}
           <Separator
             orientation="vertical"
-            className={`absolute -right-3 top-0 h-full w-[2px] ${
+            className={`absolute -right-3 top-0 h-full w-[3px] ${
               isDashboardVisible || isAboutPage ? "bg-black" : "bg-white"
             }`}
           />

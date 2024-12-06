@@ -100,7 +100,7 @@ export function Dashboard() {
           <div className="hidden md:block" />
 
           {/* Main content column */}
-          <div className="col-span-1 md:col-span-3 px-6 py-8">
+          <div className="col-span-1 md:col-span-4 px-6 py-8">
             <h1 className="mb-8 text-center text-4xl font-bold">
               Green Campus Garden
             </h1>
