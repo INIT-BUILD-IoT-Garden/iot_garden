@@ -8,6 +8,7 @@ import { GardenBackground } from "./GardenBackground";
 import { SensorCard } from "./SensorCard";
 import { StatusCard } from "./StatusCard";
 import { WeatherSummary } from "./WeatherSummary";
+import { fetchSensorData } from "../services/api";
 
 const SENSOR_CONFIGS = [
   {
@@ -50,15 +51,30 @@ const SENSOR_CONFIGS = [
 
 export function Dashboard() {
   const [sensorHistory, setSensorHistory] = useState<SensorData[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [usingMockData, setUsingMockData] = useState(false);
 
   useEffect(() => {
-    // Simulate real-time data updates
-    const interval = setInterval(() => {
-      setSensorHistory((prev) => {
-        const newData = generateMockData();
-        return [...prev, newData].slice(-10); // Keep last 10 readings
-      });
-    }, 2000);
+    const fetchData = async () => {
+      try {
+        const data = await fetchSensorData();
+        setSensorHistory(data);
+        setUsingMockData(false);
+      } catch (err) {
+        console.error('Error fetching sensor data:', err);
+        // Generate mock data as fallback
+        const mockData = Array.from({ length: 10 }, () => generateMockData());
+        setSensorHistory(mockData);
+        setUsingMockData(true);
+        setError('Using mock data - Cannot connect to sensor network');
+      }
+    };
+
+    // Initial fetch
+    fetchData();
+
+    // Set up polling every 5 seconds
+    const interval = setInterval(fetchData, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -80,8 +96,7 @@ export function Dashboard() {
     {
       id: "2",
       type: "info" as const,
-      message:
-        "Laboris deserunt dolore incididunt officia non amet id commodo velit voluptate eu.",
+      message: "Air temperature is above recommended threshold for Succulents",
       timestamp: new Date(Date.now() - 3600000).toISOString(),
     },
   ];
@@ -120,7 +135,7 @@ export function Dashboard() {
                   <StatusCard
                     key="system"
                     title="System Status"
-                    status="online"
+                    status={usingMockData ? "error" : "online"}
                     lastUpdate={new Date().toLocaleString(undefined, {
                       hour: "numeric",
                       minute: "numeric",
@@ -128,10 +143,11 @@ export function Dashboard() {
                       month: "numeric",
                       day: "numeric",
                     })}
+                    message={usingMockData ? "Fallback enabled" : undefined}
                   />,
                   <StatusCard
                     key="network"
-                    title="Sensor Network"
+                    title="Visitor Count"
                     status="online"
                     lastUpdate={new Date().toLocaleString(undefined, {
                       hour: "numeric",
@@ -140,6 +156,7 @@ export function Dashboard() {
                       month: "numeric",
                       day: "numeric",
                     })}
+                    message={`Current visitors: ${sensorHistory[sensorHistory.length - 1]?.target_count ?? 0}`}
                   />,
                   <WeatherSummary key="weather" />,
                   <AlertCard key="alerts" alerts={mockAlerts} />,
