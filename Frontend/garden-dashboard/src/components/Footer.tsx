@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Github } from 'lucide-react';
+import { Divide, Facebook, Github, Instagram, Twitter } from 'lucide-react';
 import gsap from 'gsap';
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 
@@ -38,13 +38,46 @@ export function Footer({ onDirtHeightChange }: FooterProps) {
       <div className="w-full h-full bg-gradient-to-b from-[#2d5a27] via-10% via-[#3e2213] to-50% to-[#5e3c22]">
         <div className="relative z-20 container mx-auto px-4 h-full flex items-center justify-between text-white/90">
           <div>
-            <h3 className="text-xl font-semibold">laboris dolor et elit occaecat</h3>
+            <a 
+              href="https://www.weareinit.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 hover:text-white transition-colors">
+                Init website
+            </a>
             <p className="text-sm text-white/70">
-            cillum occaecat exercitation ullamco commodo ullamco do sit proident culpa
+              Contact us at fiu@weareinit.org
+            </p>
+            <a 
+              href="https://gcifiu.wixsite.com/website"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 hover:text-white transition-colors">
+                GCI Website
+            </a>
+            <a 
+              href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 hover:text-white transition-colors">
+            </a>
+          </div>
+          
+          <div className="text-center flex-1">
+            <p className="text-sm text-white/70">
+              <strong>Green Campus Initiative</strong><br />
+              A student organization in the FIU Honors College dedicated to increasing sustainability at the campus, county, and state level.
+            </p>
+          </div>
+          <div className="text-center flex-1">
+            <p className="text-sm text-white/70">
+              <strong>Init Mission</strong><br />
+              We empower underserved communities to launch successful careers in technology.
             </p>
           </div>
           
-          <div className="flex items-center gap-4">
+
+          <div className="flex items-center gap-4 ml-auto">
             <a 
               href="https://github.com/link/to/repo" 
               target="_blank" 
@@ -52,9 +85,33 @@ export function Footer({ onDirtHeightChange }: FooterProps) {
               className="text-white/70 hover:text-white transition-colors"
             >
               <Github className="h-5 w-5" />
+            </a>  
+            <a
+              href="https://www.instagram.com/init.fiu/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 hover:text-white transition-colors"
+            >
+              <Instagram className="h-5 w-5"/>
+            </a>
+            <a 
+              href="https://x.com/initfiu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 hover:text-white/50"
+            >
+              <Twitter className="h-5 w-5"/>
+            </a>
+            <a 
+              href="https://www.facebook.com/init.fiu/"
+              target="_blank"
+              rel="noopener norefferer"
+              className="text-white/70 hover:text-white/50"
+            >
+              <Facebook className="h-5 w-5"/>
             </a>
             <p className="text-sm text-white/50">
-              © {new Date().getFullYear()} yadayadaayada
+              © {new Date().getFullYear()} 
             </p>
           </div>
         </div>
