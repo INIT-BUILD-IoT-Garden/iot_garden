@@ -10,9 +10,12 @@ export function AboutUs() {
   useEffect(() => {
     const hash = window.location.hash.slice(1) || "about";
     window.history.replaceState(null, "", "/about");
-    
+
     console.log("TeamMembers data:", teamMembers);
-    console.log("TeamMembers structure:", JSON.stringify(teamMembers[0], null, 2));
+    console.log(
+      "TeamMembers structure:",
+      JSON.stringify(teamMembers[0], null, 2),
+    );
   }, []);
 
   return (
