@@ -1,22 +1,16 @@
-import { useState, useCallback } from 'react';
-import { Dashboard } from './components/Dashboard'
-import { Footer } from './components/Footer'
-import { GardenBackground } from './components/GardenBackground'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AboutUs } from "./pages/AboutUs";
+import { Home } from "./pages/Home";
 
 function App() {
-  const [grassOffset, setGrassOffset] = useState(0);
-
-  const handleDirtHeightChange = useCallback((height: number) => {
-    setGrassOffset(height);
-  }, []);
-
   return (
-    <div className="min-h-screen bg-background">
-      <GardenBackground grassOffset={grassOffset} />
-      <Dashboard />
-      <Footer onDirtHeightChange={handleDirtHeightChange} />
-    </div>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<AboutUs />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;

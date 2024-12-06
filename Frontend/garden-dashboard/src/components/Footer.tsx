@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback } from 'react';
 import { Divide, Facebook, Github, Instagram, Twitter } from 'lucide-react';
 import gsap from 'gsap';
@@ -28,16 +29,14 @@ export function Footer({ onDirtHeightChange }: FooterProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [onDirtHeightChange, maxDirtHeight]);
 
+
+export function Footer() {
   return (
-    <footer 
-      className={`fixed bottom-0 left-0 right-0 transform ${
-        isOpen ? 'translate-y-0' : 'translate-y-full'
-      }`}
-      style={{ height: `${maxDirtHeight}px` }}
-    >
-      <div className="w-full h-full bg-gradient-to-b from-[#2d5a27] via-10% via-[#3e2213] to-50% to-[#5e3c22]">
-        <div className="relative z-20 container mx-auto px-4 h-full flex items-center justify-between text-white/90">
+    <footer>
+      <div className="h-40 w-full bg-gradient-to-b from-[#2d5a27] via-[#3e2213] via-10% to-[#5e3c22] to-50%">
+        <div className="container relative z-20 mx-auto flex h-full items-center justify-between px-4 text-white/90">
           <div>
+
             <a 
               href="https://www.weareinit.org/"
               target="_blank"
@@ -47,6 +46,7 @@ export function Footer({ onDirtHeightChange }: FooterProps) {
             </a>
             <p className="text-sm text-white/70">
               Contact us at fiu@weareinit.org
+
             </p>
             <a 
               href="https://gcifiu.wixsite.com/website"
@@ -62,6 +62,7 @@ export function Footer({ onDirtHeightChange }: FooterProps) {
               className="text-white/70 hover:text-white transition-colors">
             </a>
           </div>
+
           
           <div className="text-center flex-1">
             <p className="text-sm text-white/70">
@@ -81,8 +82,9 @@ export function Footer({ onDirtHeightChange }: FooterProps) {
             <a 
               href="https://github.com/link/to/repo" 
               target="_blank" 
+
               rel="noopener noreferrer"
-              className="text-white/70 hover:text-white transition-colors"
+              className="text-white/70 transition-colors hover:text-white"
             >
               <Github className="h-5 w-5" />
             </a>  
