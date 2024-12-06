@@ -152,8 +152,9 @@ export function GardenBackground() {
 
       // Draw sky gradient
       const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      skyGradient.addColorStop(0, "#afddfc");
-      skyGradient.addColorStop(1, "#adf8c7");
+      skyGradient.addColorStop(0, "#2AACD4");
+      skyGradient.addColorStop(0.7, "#DCDBDF");
+      skyGradient.addColorStop(1, "#FFD9AB");
       ctx.fillStyle = skyGradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
