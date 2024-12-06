@@ -1,8 +1,11 @@
 import { useEffect, useRef } from "react";
+import { Insect } from './Insects';
 
 export function GardenBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationIdRef = useRef<number>();
+  const insectsRef = useRef<Insect[]>([]);
+  const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -144,6 +147,23 @@ export function GardenBackground() {
       };
     });
 
+    // Initialize insects
+    const INSECT_COUNT = 15;
+    insectsRef.current = Array.from({ length: INSECT_COUNT }, () => 
+      new Insect(canvas.width, canvas.height)
+    );
+
+    // Add mouse move handler
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    };
+
+    canvas.addEventListener('mousemove', handleMouseMove);
+
     const drawScene = (time: number) => {
       if (!ctx || !canvas) return;
 
@@ -157,6 +177,13 @@ export function GardenBackground() {
       skyGradient.addColorStop(1, "#FFD9AB");
       ctx.fillStyle = skyGradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Update and draw insects
+      insectsRef.current.forEach(insect => {
+        insect.setCursor(mouseRef.current.x, mouseRef.current.y);
+        insect.update(canvas.width, canvas.height);
+        insect.draw(ctx);
+      });
 
       // Sort blades by y position for better layering
       blades.sort((a, b) => a.x - b.x);
@@ -202,6 +229,7 @@ export function GardenBackground() {
         cancelAnimationFrame(animationIdRef.current);
       }
       window.removeEventListener("resize", resizeCanvas);
+      canvas.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
