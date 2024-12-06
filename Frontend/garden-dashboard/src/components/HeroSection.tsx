@@ -1,16 +1,16 @@
-import * as React from "react";
 import clouds from "@/assets/cloud.png";
-import LogoInitSVG from "@/assets/logo_init.tsx";
 import LogoGCI from "@/assets/logo_gci.tsx";
+import LogoInitSVG from "@/assets/logo_init.tsx";
 import PantherSVG from "@/assets/panther.tsx";
 import { Constellation } from "@/components/ui/Constellation";
+import * as React from "react";
 
 export function HeroSection() {
   // Generate random star positions and properties
-  const stars = Array.from({ length: 100 }, () => ({
-    top: `${Math.random() * 100}%`,
+  const stars = Array.from({ length: 150 }, () => ({
+    top: `${Math.random() * 85}%`,
     left: `${Math.random() * 100}%`,
-    size: Math.random() * 2 + 3,
+    size: Math.random() * 2 + 2.5,
     delay: Math.random() * 5,
     duration: Math.random() * 2 + 5,
   }));
@@ -47,7 +47,7 @@ export function HeroSection() {
   // console.log("Logo GCI ViewBox:", logoGCIViewBox);
 
   return (
-    <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-b from-slate-950 via-slate-950 to-sky-950">
+    <section className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[linear-gradient(theme(colors.black),theme(colors.black),theme(colors.slate.950),theme(colors.slate.950),theme(colors.slate.950),theme(colors.blue.950),theme(colors.blue.700),rgba(42,172,212,1))] ">
       {/* Stars with random twinkling */}
       <div className="absolute inset-0 z-0">
         {stars.map((star, i) => (
@@ -69,7 +69,7 @@ export function HeroSection() {
       </div>
 
       {/* Init Logo Constellation */}
-      <div className="absolute left-8 bottom-8 z-10">
+      <div className="absolute left-8 bottom-40 z-10">
         <Constellation
           pathData={logoInitPaths}
           viewBox={logoInitViewBox}
@@ -86,7 +86,7 @@ export function HeroSection() {
         <Constellation
           pathData={logoGCIPaths}
           viewBox={logoGCIViewBox}
-          className="w-[40%]" 
+          className="w-[40%]"
           starCount={150}
           starSize={[1, 5]}
           delayRange={[0, 2]}
@@ -105,11 +105,9 @@ export function HeroSection() {
 
       {/* Clouds */}
       <div
-        className="absolute inset-0 z-20 animate-clouds-back"
+        className="absolute inset-0 z-10 bg-repeat animate-clouds-back invert-[0.2]"
         style={{
           backgroundImage: `url(${clouds})`,
-          backgroundRepeat: "repeat",
-          backgroundPosition: "top center",
         }}
       />
 
@@ -118,8 +116,8 @@ export function HeroSection() {
         <div className="grid grid-cols-1 md:grid-cols-5">
           <div className="hidden md:block" />
           <div className="col-span-1 md:col-span-3 px-4 text-center">
-            <h1 className="mb-6 text-6xl font-bold text-white md:text-7xl">
-              Green Campus
+            <h1 className="mb-6 text-6xl font-bold text-white md:text-7xl gradient">
+              INIT x Green Campus
             </h1>
             <p className="mx-auto mb-8 max-w-2xl text-xl text-white/80 md:text-2xl">
               Monitoring and maintaining our garden ecosystem through advanced
@@ -127,7 +125,7 @@ export function HeroSection() {
             </p>
             <a
               href="#dashboard"
-              className="group inline-block cursor-pointer rounded-xl bg-white/10 px-4 py-2 text-white/50 transition-colors hover:text-white/80"
+              className="group inline-block cursor-pointer rounded-xl bg-black/90 border px-4 py-2 text-white/60 transition-colors hover:text-white/80"
             >
               <p className="text-sm">Scroll to explore</p>
               <svg
