@@ -62,8 +62,8 @@ module.exports = {
           "50%": { opacity: 0.2, transform: "scale(0.8)" },
         },
         "clouds-back": {
-          from: { backgroundPosition: "0 -400px" },
-          to: { backgroundPosition: "10000px -400px" },
+          from: { backgroundPosition: "0 150px" },
+          to: { backgroundPosition: "10000px 150px" },
         },
         "twinkle-constellation": {
           "0%, 100%": { opacity: "1" },
@@ -73,7 +73,7 @@ module.exports = {
       animation: {
         twinkle: "twinkle var(--duration) ease-in-out infinite",
         "clouds-back": "clouds-back 350s linear infinite",
-        constellation: "constellation 30s ease-in-out infinite",
+        constellation: "constellation 8s ease-in-out infinite",
         "twinkle-constellation":
           "twinkle-constellation var(--duration) ease-in-out infinite",
       },

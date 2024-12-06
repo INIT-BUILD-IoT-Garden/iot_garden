@@ -142,7 +142,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
 
       {/* Desktop Menu */}
       <nav
-        className={`fixed left-12 z-50 hidden transition-all duration-500 ease-in-out md:block ${
+        className={`fixed left-12 lg:left-24 xl:left-44 z-50 hidden transition-all duration-500 ease-in-out md:block ${
           isDashboardVisible || isAboutPage ? "top-32" : "top-1/3"
         }`}
       >
