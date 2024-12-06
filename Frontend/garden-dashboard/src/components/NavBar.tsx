@@ -159,7 +159,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
                     e.preventDefault();
                     handleNavigation(item.href);
                   }}
-                  className={`text-lg font-semibold hover:text-green-950 transition-colors hover:opacity-90 ${
+                  className={`text-lg font-semibold transition-colors hover:opacity-90 ${
                     isDashboardVisible || isAboutPage
                       ? "text-black"
                       : "text-white"
