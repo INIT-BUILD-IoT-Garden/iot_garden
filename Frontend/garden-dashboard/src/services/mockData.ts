@@ -9,7 +9,7 @@ export const generateMockData = (): SensorData => ({
   hydrogen_voltage: parseFloat((2.5 + Math.random()).toFixed(2)),
   co2: parseFloat((400 + Math.random() * 200).toFixed(2)),
   tvoc: parseFloat((100 + Math.random() * 50).toFixed(2)),
-  target_count: Math.floor(Math.random() * 3),
+  target_count: Math.floor(12 + Math.random() * 16),
   target_speed: parseFloat((Math.random() * 2).toFixed(2)),
   target_distance: parseFloat((0.5 + Math.random() * 2).toFixed(2)),
   target_energy: Math.floor(Math.random() * 1000),
