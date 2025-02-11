@@ -34,7 +34,7 @@ export const createPages = (members: TeamMember[]): Page[] => {
   const pages: Page[] = [
     {
       front: {
-        content: "/textures/cover.jpg",
+        content: "../../assets/textures/cover.jpg",
         type: "cover",
       },
       back: {
@@ -74,7 +74,7 @@ export const createPages = (members: TeamMember[]): Page[] => {
       type: "bio"
     },
     back: {
-      content: "/textures/cover.jpg",
+      content: "../../assets/textures/cover.jpg",
       type: "cover"
     }
   });

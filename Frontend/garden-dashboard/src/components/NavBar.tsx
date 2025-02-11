@@ -1,11 +1,12 @@
 import { Separator } from "@/components/ui/Separator";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
-  { title: "Home", href: "#hero" },
+  { title: "Home", href: "/" },
   { title: "Dashboard", href: "#dashboard" },
-  { title: "About", href: "/about" },
+  { title: "About", href: "#/about" },
   { title: "Instagram", href: "https://www.instagram.com/gcifiu" },
 ];
 
@@ -18,6 +19,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
   const [activeSection, setActiveSection] = useState(
     isAboutPage ? "about" : "hero",
   );
+  const navigate = useNavigate();
 
   const updateActiveSection = (section: string) => {
     setActiveSection(section);
@@ -68,22 +70,28 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
   );
 
   const handleNavigation = (href: string) => {
-    if (href.startsWith("#")) {
+    if (href === "/") {
+      navigate("/");
+    } else if (href.startsWith("#/")) {
+      // Route navigation (About page)
+      navigate(href.replace("#", ""));
+    } else if (href.startsWith("#")) {
+      const sectionId = href.replace("#", "");
       if (isAboutPage) {
-        // Store the target section in sessionStorage before navigation
-        const targetSection = href.slice(1);
-        sessionStorage.setItem("scrollTarget", targetSection);
-        window.location.href = "/";
+        // Store the target section and navigate to home
+        sessionStorage.setItem("scrollTarget", sectionId);
+        navigate("/");
       } else {
-        const sectionId = href.slice(1);
+        // We're on the home page, scroll to section
         const section = document.getElementById(sectionId);
         if (section) {
           section.scrollIntoView({ behavior: "smooth" });
+          // Update URL without triggering navigation
+          history.pushState(null, "", `#${sectionId}`);
+          // Update active section
           updateActiveSection(sectionId);
         }
       }
-    } else if (href === "/about") {
-      window.location.href = href;
     } else if (href.startsWith("https://")) {
       window.open(href, "_blank");
     }
@@ -149,7 +157,7 @@ export function NavBar({ isAboutPage = false }: NavBarProps) {
         <div className="relative flex flex-col items-end gap-5">
           {menuItems.map((item) => {
             const isActive = isAboutPage
-              ? item.href === "/about"
+              ? item.href === "/#/about"
               : activeSection === item.href.replace("#", "");
             return (
               <div key={item.title} className="group relative">

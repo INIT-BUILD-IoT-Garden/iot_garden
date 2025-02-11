@@ -6,18 +6,26 @@ import { useEffect } from "react";
 
 export function Home() {
   useEffect(() => {
-    // Check if there's a stored scroll target
+    // Function to handle scrolling to sections
+    const scrollToSection = (sectionId: string) => {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+    };
+
+    // Check if there's a stored scroll target first
     const scrollTarget = sessionStorage.getItem("scrollTarget");
     if (scrollTarget) {
-      // Clear the stored target
       sessionStorage.removeItem("scrollTarget");
-      // Wait for the page to fully render
-      setTimeout(() => {
-        const targetSection = document.getElementById(scrollTarget);
-        if (targetSection) {
-          targetSection.scrollIntoView({ behavior: "smooth" });
-        }
-      }, 100);
+      scrollToSection(scrollTarget);
+    }
+    // If no stored target, check URL hash
+    else if (window.location.hash) {
+      const hash = window.location.hash.replace("#", "");
+      scrollToSection(hash);
     }
   }, []);
 

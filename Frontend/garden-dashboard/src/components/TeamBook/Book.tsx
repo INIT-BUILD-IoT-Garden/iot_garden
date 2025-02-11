@@ -1,4 +1,4 @@
-import { useCursor, useTexture, Html } from "@react-three/drei";
+import { Html, useCursor, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useAtom } from "jotai";
 import { easing } from "maath";
@@ -6,22 +6,27 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bone,
   BoxGeometry,
+  CanvasTexture,
   Color,
   Float32BufferAttribute,
+  LinearFilter,
   MathUtils,
   MeshStandardMaterial,
   Skeleton,
   SkinnedMesh,
   Uint16BufferAttribute,
   Vector3,
-  CanvasTexture,
-  LinearFilter,
 } from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 
 import { pageAtom } from "./UI";
-import pageBackground from "/textures/bio-background.jpg"
-import defaultCover from "/textures/cover.jpg"
+
+const pageBackground = new URL(
+  "../../assets/textures/bio-background.jpg",
+  import.meta.url,
+).href;
+const defaultCover = new URL("../../assets/textures/cover.jpg", import.meta.url)
+  .href;
 
 const easingFactor = 0.5; // Controls the speed of the easing
 const easingFactorFold = 0.3; // Controls the speed of the easing
@@ -105,47 +110,50 @@ const pageMaterials = [
   }),
 ];
 
-
-function createTextTexture(content: { name: string; role: string; bio: string }) {
-  const canvas = document.createElement('canvas');
+function createTextTexture(content: {
+  name: string;
+  role: string;
+  bio: string;
+}) {
+  const canvas = document.createElement("canvas");
   canvas.width = 1024;
   canvas.height = 1024;
-  
-  const ctx = canvas.getContext('2d');
+
+  const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
   // Set background
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+  ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Configure text styles
-  ctx.fillStyle = 'black';
-  ctx.textAlign = 'center';
-  
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
+
   // Name
-  ctx.font = 'bold 74px Arial';
+  ctx.font = "bold 74px Arial";
   ctx.fillText(content.name, canvas.width / 2, 100);
-  
+
   // Role
-  ctx.font = '55px Arial';
-  ctx.fillStyle = '#111';
+  ctx.font = "55px Arial";
+  ctx.fillStyle = "#111";
   ctx.fillText(content.role, canvas.width / 2, 190);
-  
+
   // Bio (with word wrap)
-  ctx.font = '48px Arial';
-  ctx.fillStyle = '#222';
+  ctx.font = "48px Arial";
+  ctx.fillStyle = "#222";
   const maxWidth = 750;
   const lineHeight = 60;
-  const words = content.bio.split(' ');
-  let line = '';
+  const words = content.bio.split(" ");
+  let line = "";
   let y = 300;
 
-  words.forEach(word => {
-    const testLine = line + word + ' ';
+  words.forEach((word) => {
+    const testLine = line + word + " ";
     const metrics = ctx.measureText(testLine);
     if (metrics.width > maxWidth) {
       ctx.fillText(line, canvas.width / 2, y);
-      line = word + ' ';
+      line = word + " ";
       y += lineHeight;
     } else {
       line = testLine;
@@ -181,17 +189,11 @@ const Page = ({
   const skinnedMeshRef = useRef();
   const [highlighted, setHighlighted] = useState(false);
 
-  const frontTexture = useTexture(
-    front.type !== "bio" 
-      ? (front.content as string) || defaultCover 
-      : pageBackground
-  );
-
-  const backTexture = useTexture(
-    back.type !== "bio" 
-      ? (back.content as string) || defaultCover
-      : pageBackground
-  );
+  const textures = useTexture({
+    frontTexture: front.type === "image" ? front.content : defaultCover,
+    backTexture: back.type === "image" ? back.content : defaultCover,
+    backgroundTexture: pageBackground,
+  });
 
   const lastOpened = useRef(false);
   const turnedAt = useRef(0);
@@ -219,16 +221,19 @@ const Page = ({
     }
     const skeleton = new Skeleton(bones);
 
-    const bioTexture = front.type === "bio" 
-      ? createTextTexture(front.content as { name: string; role: string; bio: string })
-      : null;
+    const bioTexture =
+      front.type === "bio"
+        ? createTextTexture(
+            front.content as { name: string; role: string; bio: string },
+          )
+        : null;
 
     const materials = [
       ...pageMaterials,
       // Front material
       new MeshStandardMaterial({
         color: whiteColor,
-        map: front.type === "bio" ? bioTexture : frontTexture,
+        map: front.type === "bio" ? bioTexture : textures.frontTexture,
         roughness: 0.9,
         emissive: emissiveColor,
         emissiveIntensity: 0,
@@ -236,7 +241,7 @@ const Page = ({
       // Back material
       new MeshStandardMaterial({
         color: whiteColor,
-        map: backTexture,
+        map: textures.backTexture,
         roughness: 0.5,
         emissive: emissiveColor,
         emissiveIntensity: 0,
@@ -250,7 +255,7 @@ const Page = ({
     mesh.add(skeleton.bones[0]);
     mesh.bind(skeleton);
     return mesh;
-  }, [frontTexture, backTexture, front.type, front.content] );
+  }, [textures.frontTexture, textures.backTexture, front.type, front.content]);
 
   // useHelper(skinnedMeshRef, SkeletonHelper, "red");
 
@@ -324,7 +329,7 @@ const Page = ({
   });
 
   const [_, setPage] = useAtom(pageAtom);
-  useCursor(highlighted, 'zoom-in', 'auto');
+  useCursor(highlighted, "zoom-in", "auto");
 
   return (
     <group
@@ -341,7 +346,7 @@ const Page = ({
       onClick={(e) => {
         e.stopPropagation();
         if (front.type === "bio" && (front.content as any).link) {
-          window.open((front.content as any).link, '_blank');
+          window.open((front.content as any).link, "_blank");
         }
         setHighlighted(false);
       }}
@@ -365,21 +370,25 @@ const Page = ({
 interface BookProps {
   pages?: {
     front: {
-      content: string | {
-        name?: string;
-        role?: string;
-        bio?: string;
-        link?: string;
-      };
+      content:
+        | string
+        | {
+            name?: string;
+            role?: string;
+            bio?: string;
+            link?: string;
+          };
       type: "cover" | "bio" | "image";
     };
     back: {
-      content: string | {
-        name?: string;
-        role?: string;
-        bio?: string;
-        link?: string;
-      };
+      content:
+        | string
+        | {
+            name?: string;
+            role?: string;
+            bio?: string;
+            link?: string;
+          };
       type: "cover" | "bio" | "image";
     };
   }[];
@@ -416,13 +425,22 @@ export const Book = ({ pages: bookPages = [], ...props }: BookProps) => {
     }
 
     try {
-      bookPages.forEach((page, index) => {
-        console.log(`Loading texture ${index}:`, page.front.front, page.back.back);
-        useTexture.preload(page.front.front);
-        useTexture.preload(page.back.back);
+      bookPages.forEach((page) => {
+        // Preload textures with error handling
+        if (page.front.type === "image") {
+          const frontTexture = page.front.content as string;
+          if (frontTexture) useTexture.preload(frontTexture);
+        }
+        if (page.back.type === "image") {
+          const backTexture = page.back.content as string;
+          if (backTexture) useTexture.preload(backTexture);
+        }
       });
+      // Preload default textures
+      useTexture.preload(defaultCover);
+      useTexture.preload(pageBackground);
     } catch (error) {
-      console.error("Error loading textures:", error);
+      console.error("Error preloading textures:", error);
     }
   }, [bookPages]);
 
