@@ -8,3 +8,6 @@
 *.env
 *secrets.cpp
 tree-shader
+
+
+.github/workflows/deploy.yml
