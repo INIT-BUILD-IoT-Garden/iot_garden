@@ -8,9 +8,6 @@ import { Suspense, useEffect } from "react";
 export function AboutUs() {
   // Set active section to "about" when component mounts
   useEffect(() => {
-    const hash = window.location.hash.slice(1) || "about";
-    window.history.replaceState(null, "", "/about");
-
     console.log("TeamMembers data:", teamMembers);
     console.log(
       "TeamMembers structure:",
